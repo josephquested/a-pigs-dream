@@ -91,6 +91,10 @@ public class Pig : MonoBehaviour
     {
         if (isJumping)
         {
+            // Pause gravity while dashing
+            if (dashSpeedTimer > 0)
+                return;
+
             jumpTimer += Time.deltaTime;
             
             if (jumpTimer >= jumpDuration)
@@ -144,6 +148,16 @@ public class Pig : MonoBehaviour
         if (dashSpeedTimer > 0)
         {
             dashSpeedTimer -= Time.deltaTime;
+        }
+    }
+
+    // -- COLLISIONS -- //
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Obstacle"))
+        {
+            Debug.Log("Pig hit an obstacle!");
         }
     }
 }
