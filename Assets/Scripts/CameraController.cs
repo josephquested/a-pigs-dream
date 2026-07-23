@@ -20,6 +20,7 @@ public class CameraController : MonoBehaviour
     // -- CAMERA -- //
 
     public Vector3 offset = Vector3.zero;
+    public float smoothSpeed = 0.1f;
 
     void UpdateCameraPosition()
     {
@@ -28,6 +29,6 @@ public class CameraController : MonoBehaviour
             transform.position.y,
             pig.transform.position.z + offset.z
         );
-        transform.position = targetPos;
+        transform.position = Vector3.Lerp(transform.position, targetPos, smoothSpeed);
     }
 }
