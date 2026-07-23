@@ -6,29 +6,19 @@ public class Pig : MonoBehaviour
 
     void Start()
     {
+
     }
 
     void Update()
     {
+        CheckGround();
         UpdateForwardMovement();
         UpdateSideMovement();
+        UpdateModelRotation();
         UpdateJump();
         UpdateDash();
         UpdateJumpHeight();
-        
-        // Decrease cooldowns
-        if (jumpCooldown > 0)
-        {
-            jumpCooldown -= Time.deltaTime;
-        }
-        if (dashCooldown > 0)
-        {
-            dashCooldown -= Time.deltaTime;
-        }
-        if (dashSpeedTimer > 0)
-        {
-            dashSpeedTimer -= Time.deltaTime;
-        }
+        UpdateCooldowns();
     }
 
     // -- MOVEMENT -- //
@@ -43,6 +33,9 @@ public class Pig : MonoBehaviour
     public float dashForce = 3f;
     public float dashDuration = 0.1f;
     public float dashCooldownDuration = 0.5f;
+    public float tiltAngle = 15f;
+    public float tiltSpeed = 5f;
+    public Transform pigModelTransform;
 
     public bool isGrounded;
     float jumpCooldown;
@@ -67,6 +60,18 @@ public class Pig : MonoBehaviour
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         transform.Translate(Vector3.right * horizontalInput * sideSpeed * Time.deltaTime);
+    }
+
+    void UpdateModelRotation()
+    {
+        if (pigModelTransform == null)
+            return;
+
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float targetTilt = -horizontalInput * tiltAngle;
+        
+        Quaternion targetRotation = Quaternion.Euler(0, 0, targetTilt);
+        pigModelTransform.localRotation = Quaternion.Lerp(pigModelTransform.localRotation, targetRotation, tiltSpeed * Time.deltaTime);
     }
 
     void UpdateJump()
@@ -124,5 +129,21 @@ public class Pig : MonoBehaviour
         Vector3 checkPosition = transform.position + Vector3.down * (groundCheckDistance / 2f);
         Collider[] colliders = Physics.OverlapSphere(checkPosition, groundCheckDistance);
         isGrounded = colliders.Length > 1; // More than 1 because the pig itself is included
+    }
+
+    void UpdateCooldowns()
+    {
+        if (jumpCooldown > 0)
+        {
+            jumpCooldown -= Time.deltaTime;
+        }
+        if (dashCooldown > 0)
+        {
+            dashCooldown -= Time.deltaTime;
+        }
+        if (dashSpeedTimer > 0)
+        {
+            dashSpeedTimer -= Time.deltaTime;
+        }
     }
 }
