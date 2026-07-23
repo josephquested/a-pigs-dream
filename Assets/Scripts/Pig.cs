@@ -6,18 +6,15 @@ public class Pig : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
     }
 
     void Update()
     {
-        CheckGround();
         UpdateForwardMovement();
         UpdateSideMovement();
         UpdateJump();
         UpdateDash();
-        ApplyGravity();
-        ClampVelocity();
+        UpdateJumpHeight();
         
         // Decrease cooldowns
         if (jumpCooldown > 0)
@@ -28,6 +25,10 @@ public class Pig : MonoBehaviour
         {
             dashCooldown -= Time.deltaTime;
         }
+        if (dashSpeedTimer > 0)
+        {
+            dashSpeedTimer -= Time.deltaTime;
+        }
     }
 
     // -- MOVEMENT -- //
@@ -35,22 +36,31 @@ public class Pig : MonoBehaviour
     [Header("MOVEMENT")]
     public float forwardSpeed = 5f;
     public float sideSpeed = 5f;
-    public float jumpForce = 5f;
+    public float jumpHeight = 2f;
+    public float jumpDuration = 0.6f;
     public float groundCheckDistance = 0.1f;
     public float jumpCooldownDuration = 0.2f;
-    public float downwardForce = 5f;
-    public float dashForce = 10f;
+    public float dashForce = 3f;
+    public float dashDuration = 0.1f;
     public float dashCooldownDuration = 0.5f;
-    public float maxSpeed = 20f;
 
-    Rigidbody rb;
     public bool isGrounded;
     float jumpCooldown;
     float dashCooldown;
+    float dashSpeedTimer;
+    
+    bool isJumping;
+    float jumpTimer;
+    Vector3 jumpStartPosition;
 
     void UpdateForwardMovement()
     {
-        transform.Translate(Vector3.forward * forwardSpeed * Time.deltaTime);
+        float currentSpeed = forwardSpeed;
+        if (dashSpeedTimer > 0)
+        {
+            currentSpeed += dashForce;
+        }
+        transform.Translate(Vector3.forward * currentSpeed * Time.deltaTime);
     }
 
     void UpdateSideMovement()
@@ -61,10 +71,42 @@ public class Pig : MonoBehaviour
 
     void UpdateJump()
     {
-        if (Input.GetKey(KeyCode.Z) && isGrounded && jumpCooldown <= 0)
+        CheckGround();
+        
+        if (Input.GetKey(KeyCode.Z) && isGrounded && jumpCooldown <= 0 && !isJumping)
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isJumping = true;
+            jumpTimer = 0f;
+            jumpStartPosition = transform.position;
             jumpCooldown = jumpCooldownDuration;
+        }
+    }
+
+    void UpdateJumpHeight()
+    {
+        if (isJumping)
+        {
+            jumpTimer += Time.deltaTime;
+            
+            if (jumpTimer >= jumpDuration)
+            {
+                // Jump finished
+                isJumping = false;
+                jumpTimer = 0f;
+                Vector3 pos = transform.position;
+                pos.y = jumpStartPosition.y;
+                transform.position = pos;
+            }
+            else
+            {
+                // Jump in progress - use sine curve for smooth arc
+                float jumpProgress = jumpTimer / jumpDuration;
+                float height = Mathf.Sin(jumpProgress * Mathf.PI) * jumpHeight;
+                
+                Vector3 pos = transform.position;
+                pos.y = jumpStartPosition.y + height;
+                transform.position = pos;
+            }
         }
     }
 
@@ -72,7 +114,7 @@ public class Pig : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.X) && dashCooldown <= 0)
         {
-            rb.AddForce(Vector3.forward * dashForce, ForceMode.Impulse);
+            dashSpeedTimer = dashDuration;
             dashCooldown = dashCooldownDuration;
         }
     }
@@ -82,22 +124,5 @@ public class Pig : MonoBehaviour
         Vector3 checkPosition = transform.position + Vector3.down * (groundCheckDistance / 2f);
         Collider[] colliders = Physics.OverlapSphere(checkPosition, groundCheckDistance);
         isGrounded = colliders.Length > 1; // More than 1 because the pig itself is included
-    }
-
-    void ApplyGravity()
-    {
-        if (!isGrounded)
-        {
-            rb.AddForce(Vector3.down * downwardForce, ForceMode.Acceleration);
-        }
-    }
-
-    void ClampVelocity()
-    {
-        Vector3 velocity = rb.linearVelocity;
-        if (velocity.magnitude > maxSpeed)
-        {
-            rb.linearVelocity = velocity.normalized * maxSpeed;
-        }
     }
 }

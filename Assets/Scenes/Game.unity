@@ -407,7 +407,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 505777434}
-  - component: {fileID: 505777435}
   - component: {fileID: 505777436}
   m_Layer: 0
   m_Name: Pig
@@ -432,33 +431,6 @@ Transform:
   - {fileID: 1460030891}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &505777435
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 505777433}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 112
-  m_CollisionDetection: 0
 --- !u!114 &505777436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -473,10 +445,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Pig
   forwardSpeed: 10
   sideSpeed: 10
-  jumpForce: 10
+  jumpHeight: 2
+  jumpDuration: 0.6
   groundCheckDistance: 0.4
   jumpCooldownDuration: 0.1
-  downwardForce: 5
+  dashForce: 15
+  dashDuration: 0.3
+  dashCooldownDuration: 0.5
   isGrounded: 1
 --- !u!1 &832575517
 GameObject:
