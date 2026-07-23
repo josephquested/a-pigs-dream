@@ -36,7 +36,8 @@ public class LevelController : MonoBehaviour
     public int chunksAhead = 10;
     public GameObject blankLevelChunkPrefab;
     public float appleSpawnChance = 50f;
-    public GameObject applePrefab; 
+    public GameObject applePrefab;
+    public GameObject edgeChunkPrefab; 
 
     GameObject[] levelChunkPrefabs;
     int chunksSpawned = 0;
@@ -82,6 +83,15 @@ public class LevelController : MonoBehaviour
         
         GameObject chunk = Instantiate(chunkToSpawn, new Vector3(0, 0, nextChunkZ), Quaternion.identity);
         spawnedChunks.Add(chunk);
+        
+        // Spawn edge chunks on left and right
+        if (edgeChunkPrefab != null)
+        {
+            GameObject leftEdge = Instantiate(edgeChunkPrefab, new Vector3(-10f, 0, nextChunkZ), Quaternion.identity);
+            GameObject rightEdge = Instantiate(edgeChunkPrefab, new Vector3(10f, 0, nextChunkZ), Quaternion.Euler(0, 180f, 0));
+            spawnedChunks.Add(leftEdge);
+            spawnedChunks.Add(rightEdge);
+        }
         
         // Determine if apple should spawn based on chance
         bool shouldSpawnApple = Random.Range(0f, 100f) < appleSpawnChance;
