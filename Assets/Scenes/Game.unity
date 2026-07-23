@@ -557,7 +557,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 60
+  m_text: 30
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -810,7 +810,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 696852e90628bc5488342a8d43161aef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Pig
-  forwardSpeed: 45
+  forwardSpeed: 15
   sideSpeed: 10
   jumpHeight: 2
   jumpDuration: 0.6
