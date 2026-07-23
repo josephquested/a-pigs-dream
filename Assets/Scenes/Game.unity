@@ -194,6 +194,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2f07991bb180f6b4c9390ba7e46d6361, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2128811425}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2f07991bb180f6b4c9390ba7e46d6361, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2128811427}
   m_SourcePrefab: {fileID: 100100000, guid: 2f07991bb180f6b4c9390ba7e46d6361, type: 3}
 --- !u!1 &238776682
 GameObject:
@@ -772,7 +775,6 @@ GameObject:
   - component: {fileID: 505777434}
   - component: {fileID: 505777437}
   - component: {fileID: 505777436}
-  - component: {fileID: 505777438}
   m_Layer: 0
   m_Name: Pig
   m_TagString: Pig
@@ -849,27 +851,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &505777438
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 505777433}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.45313516, y: 1, z: 1.754164}
-  m_Center: {x: -0.008781955, y: 0, z: 0.09439871}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1199,7 +1180,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelController
   chunksAhead: 20
   blankLevelChunkPrefab: {fileID: 1828136827953393609, guid: deac5430db3ff0e43a9aa126cec6817a, type: 3}
-  appleSpawnChance: 50
+  appleSpawnChance: 5
   applePrefab: {fileID: 2630773314890223559, guid: e4f00bb8d4706414eb87ea33289f781c, type: 3}
 --- !u!1 &2128811423 stripped
 GameObject:
@@ -1233,6 +1214,28 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!64 &2128811427
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128811423}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 7406790110253308521, guid: 2f07991bb180f6b4c9390ba7e46d6361, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
