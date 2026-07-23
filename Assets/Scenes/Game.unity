@@ -229,7 +229,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameController
   gameOverScreen: {fileID: 1787802430}
   timerText: {fileID: 353766108}
-  gameTime: 60
+  gameTime: 30
 --- !u!4 &238776684
 Transform:
   m_ObjectHideFlags: 0
@@ -810,7 +810,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 696852e90628bc5488342a8d43161aef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Pig
-  forwardSpeed: 15
+  forwardSpeed: 45
   sideSpeed: 10
   jumpHeight: 2
   jumpDuration: 0.6
