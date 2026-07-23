@@ -34,7 +34,9 @@ public class LevelController : MonoBehaviour
     // -- LEVEL -- //
 
     public int chunksAhead = 10;
-    public GameObject blankLevelChunkPrefab; 
+    public GameObject blankLevelChunkPrefab;
+    public float appleSpawnChance = 50f;
+    public GameObject applePrefab; 
 
     GameObject[] levelChunkPrefabs;
     int chunksSpawned = 0;
@@ -80,6 +82,15 @@ public class LevelController : MonoBehaviour
         
         GameObject chunk = Instantiate(chunkToSpawn, new Vector3(0, 0, nextChunkZ), Quaternion.identity);
         spawnedChunks.Add(chunk);
+        
+        // Determine if apple should spawn based on chance
+        bool shouldSpawnApple = Random.Range(0f, 100f) < appleSpawnChance;
+        LevelChunk levelChunk = chunk.GetComponent<LevelChunk>();
+        if (levelChunk != null && shouldSpawnApple)
+        {
+            levelChunk.SpawnApple(applePrefab);
+        }
+        
         nextChunkZ += chunkSize;
         chunksSpawned++;
     }

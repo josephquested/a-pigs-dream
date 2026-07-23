@@ -862,6 +862,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelController
   chunksAhead: 20
   blankLevelChunkPrefab: {fileID: 1828136827953393609, guid: deac5430db3ff0e43a9aa126cec6817a, type: 3}
+  appleSpawnChance: 50
+  applePrefab: {fileID: 2630773314890223559, guid: e4f00bb8d4706414eb87ea33289f781c, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
