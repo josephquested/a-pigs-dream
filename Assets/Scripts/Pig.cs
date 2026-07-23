@@ -40,6 +40,7 @@ public class Pig : MonoBehaviour
     public float dashCooldownDuration = 0.5f;
     public float tiltAngle = 15f;
     public float tiltSpeed = 5f;
+    public float rotationAngle = 15f;
     public Transform pigModelTransform;
 
     public bool isGrounded;
@@ -74,9 +75,10 @@ public class Pig : MonoBehaviour
 
         float horizontalInput = Input.GetAxis("Horizontal");
         float targetTilt = -horizontalInput * tiltAngle;
+        float targetRotation = horizontalInput * rotationAngle;
         
-        Quaternion targetRotation = Quaternion.Euler(0, 0, targetTilt);
-        pigModelTransform.localRotation = Quaternion.Lerp(pigModelTransform.localRotation, targetRotation, tiltSpeed * Time.deltaTime);
+        Quaternion targetQuaternion = Quaternion.Euler(0, targetRotation, targetTilt);
+        pigModelTransform.localRotation = Quaternion.Lerp(pigModelTransform.localRotation, targetQuaternion, tiltSpeed * Time.deltaTime);
     }
 
     void UpdateJump()
@@ -165,6 +167,12 @@ public class Pig : MonoBehaviour
             isAlive = false;
             gameController.GameOver();
             Debug.Log("Pig hit an obstacle!");
+        }
+        
+        if (other.CompareTag("Apple"))
+        {
+            Destroy(other.gameObject);
+            gameController.AddTime(10f);
         }
     }
 }

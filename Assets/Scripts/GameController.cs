@@ -35,6 +35,12 @@ public class GameController : MonoBehaviour
         Debug.Log("Game Over!");
     }
 
+    public void AddTime(float timeToAdd)
+    {
+        timeRemaining += timeToAdd;
+        UpdateTimerDisplay();
+    }
+
     void UpdateTimer()
     {
         if (isGameOver)
