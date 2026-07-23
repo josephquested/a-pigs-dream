@@ -45,7 +45,7 @@ public class LevelController : MonoBehaviour
         // Delete chunks behind the player
         for (int i = spawnedChunks.Count - 1; i >= 0; i--)
         {
-            if (spawnedChunks[i].transform.position.z < playerZ - chunkSize)
+            if (spawnedChunks[i].transform.position.z < playerZ - (chunkSize * 2))
             {
                 Destroy(spawnedChunks[i]);
                 spawnedChunks.RemoveAt(i);

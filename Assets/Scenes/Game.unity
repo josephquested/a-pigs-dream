@@ -471,12 +471,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 696852e90628bc5488342a8d43161aef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Pig
-  forwardSpeed: 5
+  forwardSpeed: 10
   sideSpeed: 10
-  jumpForce: 5
+  jumpForce: 10
   groundCheckDistance: 0.4
-  jumpCooldownDuration: 0.2
-  isGrounded: 0
+  jumpCooldownDuration: 0.1
+  downwardForce: 5
+  isGrounded: 1
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
