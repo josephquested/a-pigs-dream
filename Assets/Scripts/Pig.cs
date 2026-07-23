@@ -4,13 +4,18 @@ public class Pig : MonoBehaviour
 {
     // -- SYSTEM -- //
 
-    void Start()
-    {
+    GameController gameController;
+    bool isAlive = true;
 
+    void Awake()
+    {
+        gameController = GameObject.FindFirstObjectByType<GameController>();
     }
 
     void Update()
     {
+        if (!isAlive) return;
+
         CheckGround();
         UpdateForwardMovement();
         UpdateSideMovement();
@@ -157,6 +162,8 @@ public class Pig : MonoBehaviour
     {
         if (other.CompareTag("Obstacle"))
         {
+            isAlive = false;
+            gameController.GameOver();
             Debug.Log("Pig hit an obstacle!");
         }
     }

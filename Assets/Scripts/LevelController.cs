@@ -11,6 +11,14 @@ public class LevelController : MonoBehaviour
     {
         pig = GameObject.FindGameObjectWithTag("Pig");
         
+        // Load all level chunk prefabs from Resources folder
+        levelChunkPrefabs = Resources.LoadAll<GameObject>("LevelChunks");
+        if (levelChunkPrefabs.Length == 0)
+        {
+            Debug.LogError("No level chunks found in Assets/Resources/LevelChunks/");
+            return;
+        }
+        
         // Spawn initial chunks
         for (int i = 0; i < chunksAhead; i++)
         {
@@ -25,8 +33,11 @@ public class LevelController : MonoBehaviour
 
     // -- LEVEL -- //
 
-    public GameObject levelChunkPrefab;
     public int chunksAhead = 10;
+    public GameObject blankLevelChunkPrefab; 
+
+    GameObject[] levelChunkPrefabs;
+    int chunksSpawned = 0;
 
     List<GameObject> spawnedChunks = new List<GameObject>();
     float nextChunkZ = 0f;
@@ -55,8 +66,21 @@ public class LevelController : MonoBehaviour
 
     void SpawnChunk()
     {
-        GameObject chunk = Instantiate(levelChunkPrefab, new Vector3(0, 0, nextChunkZ), Quaternion.identity);
+        GameObject chunkToSpawn;
+        
+        // Use blank chunk for first 3, then random
+        if (chunksSpawned < 3)
+        {
+            chunkToSpawn = blankLevelChunkPrefab;
+        }
+        else
+        {
+            chunkToSpawn = levelChunkPrefabs[Random.Range(0, levelChunkPrefabs.Length)];
+        }
+        
+        GameObject chunk = Instantiate(chunkToSpawn, new Vector3(0, 0, nextChunkZ), Quaternion.identity);
         spawnedChunks.Add(chunk);
         nextChunkZ += chunkSize;
+        chunksSpawned++;
     }
 }
