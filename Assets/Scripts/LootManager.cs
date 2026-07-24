@@ -2,9 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LootLocker.Requests;
+using TMPro;
 
 public class LootManager : MonoBehaviour
 {
+    const string PlayerNamePrefsKey = "PLAYER_NAME";
+
     private static LootManager instance;
     public static LootManager Instance => instance;
 
@@ -23,6 +26,7 @@ public class LootManager : MonoBehaviour
     void Start()
     {
         ConnectToLootLocker();
+        LoadSavedPlayerName();
     }
 
     void ConnectToLootLocker()
@@ -38,6 +42,51 @@ public class LootManager : MonoBehaviour
 
             Debug.Log("successfully started LootLocker session");
         });
+    }
+
+    public TMP_InputField playerNameInputField;
+    string playerName;
+
+    public void UpdatePlayerName()
+    {
+        if (playerNameInputField == null)
+            return;
+
+        string enteredName = playerNameInputField.text.Trim();
+        if (string.IsNullOrEmpty(enteredName))
+            return;
+
+        string _name = enteredName.ToUpper();
+        playerName = _name;
+        playerNameInputField.text = playerName;
+
+        PlayerPrefs.SetString(PlayerNamePrefsKey, playerName);
+        PlayerPrefs.Save();
+
+        LootLockerSDKManager.SetPlayerName(playerName, (response) =>
+        {
+            if (response.success)
+            {
+                print("set name");
+            }
+            else
+            {
+                print("failed to set name");
+            }
+        });
+    }
+
+    void LoadSavedPlayerName()
+    {
+        if (playerNameInputField == null)
+            return;
+
+        string savedName = PlayerPrefs.GetString(PlayerNamePrefsKey, "");
+        if (string.IsNullOrEmpty(savedName))
+            return;
+
+        playerName = savedName;
+        playerNameInputField.text = playerName;
     }
 
     void AddScore()
