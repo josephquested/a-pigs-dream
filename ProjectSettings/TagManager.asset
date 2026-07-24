@@ -8,6 +8,7 @@ TagManager:
   - Obstacle
   - Apple
   - Ground
+  - Bush
   layers:
   - Default
   - TransparentFX

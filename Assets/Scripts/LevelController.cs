@@ -52,7 +52,7 @@ public class LevelController : MonoBehaviour
 
     List<GameObject> spawnedChunks = new List<GameObject>();
     float nextChunkZ = 0f;
-    float chunkSize = 5f;
+    float chunkSize = 10f;
 
     void UpdateLevelGeneration()
     {

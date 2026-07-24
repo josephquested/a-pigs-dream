@@ -243,6 +243,25 @@ public class Pig : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        if (!isAlive)
+            return;
+
+        if (other.CompareTag("Bush"))
+        {
+            if (dashSpeedTimer > 0f)
+            {
+                Destroy(other.gameObject);
+            }
+            else
+            {
+                isAlive = false;
+                gameController.GameOver();
+                Debug.Log("Pig hit a bush without dashing!");
+            }
+
+            return;
+        }
+
         if (other.CompareTag("Obstacle"))
         {
             isAlive = false;
