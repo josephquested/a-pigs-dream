@@ -73,7 +73,7 @@ public class LevelController : MonoBehaviour
         GameObject chunkToSpawn;
         
         // Use blank chunk for first 3, then random
-        if (chunksSpawned < 3)
+        if (chunksSpawned < 8)
         {
             chunkToSpawn = blankLevelChunkPrefab;
         }

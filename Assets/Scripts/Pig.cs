@@ -20,6 +20,7 @@ public class Pig : MonoBehaviour
             return;
 
         CheckGround();
+        UpdateSpeedProgression();
         UpdateForwardMovement();
         UpdateSideMovement();
         UpdateModelRotation();
@@ -39,6 +40,7 @@ public class Pig : MonoBehaviour
     public float jumpDuration = 0.6f;
     public float groundCheckDistance = 0.1f;
     public float jumpCooldownDuration = 0.2f;
+    public float speedIncreasePerSecond = 0.1f;
     public float dashForce = 3f;
     public float dashDuration = 0.1f;
     public float dashCooldownDuration = 0.5f;
@@ -56,15 +58,32 @@ public class Pig : MonoBehaviour
     float dashCooldown;
     float dashSpeedTimer;
     float fallSpeed;
+    float currentForwardSpeed;
+    float currentSideSpeed;
 
     bool isJumping;
     bool hasJumpedSinceLastGrounded;
     float jumpTimer;
     Vector3 jumpStartPosition;
 
+    void Start()
+    {
+        currentForwardSpeed = forwardSpeed;
+        currentSideSpeed = sideSpeed;
+    }
+
+    void UpdateSpeedProgression()
+    {
+        if (speedIncreasePerSecond <= 0f)
+            return;
+
+        currentForwardSpeed += speedIncreasePerSecond * Time.deltaTime;
+        currentSideSpeed += speedIncreasePerSecond * Time.deltaTime;
+    }
+
     void UpdateForwardMovement()
     {
-        float currentSpeed = forwardSpeed;
+        float currentSpeed = currentForwardSpeed;
         if (dashSpeedTimer > 0)
         {
             currentSpeed += dashForce;
@@ -76,7 +95,7 @@ public class Pig : MonoBehaviour
     void UpdateSideMovement()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
-        transform.Translate(Vector3.right * horizontalInput * sideSpeed * Time.deltaTime);
+        transform.Translate(Vector3.right * horizontalInput * currentSideSpeed * Time.deltaTime);
     }
 
     void UpdateModelRotation()

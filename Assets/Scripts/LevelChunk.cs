@@ -37,12 +37,12 @@ public class LevelChunk : MonoBehaviour
             float randomX = Random.Range(topLeftSpawnPoint.position.x, bottomRightSpawnPoint.position.x);
             float randomZ = Random.Range(topLeftSpawnPoint.position.z, bottomRightSpawnPoint.position.z);
             Vector3 spawnPosition = new Vector3(randomX, spawnYOffset, randomZ);
-            Quaternion spawnRotation = randomizeYRotation
-                ? Quaternion.Euler(0f, Random.Range(0f, 360f), 0f)
-                : Quaternion.identity;
+            Vector3 prefabEuler = objectToSpawn.transform.rotation.eulerAngles;
+            float yRotation = randomizeYRotation ? Random.Range(0f, 360f) : prefabEuler.y;
+            Quaternion spawnRotation = Quaternion.Euler(prefabEuler.x, yRotation, prefabEuler.z);
 
-            // Instantiate the object at the determined position
-            Instantiate(objectToSpawn, spawnPosition, spawnRotation);
+            // Parent spawned objects to this chunk so cleanup happens with the chunk.
+            Instantiate(objectToSpawn, spawnPosition, spawnRotation, transform);
         }
     }
 
@@ -55,11 +55,11 @@ public class LevelChunk : MonoBehaviour
         float randomX = Random.Range(topLeftSpawnPoint.position.x, bottomRightSpawnPoint.position.x);
         float randomZ = Random.Range(topLeftSpawnPoint.position.z, bottomRightSpawnPoint.position.z);
         Vector3 spawnPosition = new Vector3(randomX, spawnYOffset, randomZ);
-        Quaternion spawnRotation = randomizeYRotation
-            ? Quaternion.Euler(0f, Random.Range(0f, 360f), 0f)
-            : Quaternion.identity;
+        Vector3 prefabEuler = applePrefab.transform.rotation.eulerAngles;
+        float yRotation = randomizeYRotation ? Random.Range(0f, 360f) : prefabEuler.y;
+        Quaternion spawnRotation = Quaternion.Euler(prefabEuler.x, yRotation, prefabEuler.z);
 
-        // Instantiate the apple at the determined position
-        Instantiate(applePrefab, spawnPosition, spawnRotation);
+        // Parent spawned apples to this chunk so cleanup happens with the chunk.
+        Instantiate(applePrefab, spawnPosition, spawnRotation, transform);
     }
 }
