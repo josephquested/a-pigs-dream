@@ -3625,8 +3625,8 @@ MonoBehaviour:
   applePrefab: {fileID: 2630773314890223559, guid: e4f00bb8d4706414eb87ea33289f781c, type: 3}
   edgeChunkPrefab: {fileID: 1921689970243370568, guid: 73bd5b025c2d33e43aba0f263a011727, type: 3}
   blankChunkChanceText: {fileID: 2105365779}
-  guaranteedInitialBlankChunks: 7
-  startingBlankChunkChance: 0.8
+  guaranteedInitialBlankChunks: 4
+  startingBlankChunkChance: 0.7
   minimumBlankChunkChance: 0.1
   difficultyRampSpeed: 0.005
 --- !u!1 &2105365777
