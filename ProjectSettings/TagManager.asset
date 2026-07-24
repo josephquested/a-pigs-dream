@@ -7,6 +7,7 @@ TagManager:
   - Pig
   - Obstacle
   - Apple
+  - Ground
   layers:
   - Default
   - TransparentFX

@@ -41,6 +41,7 @@ public class LevelController : MonoBehaviour
 
     GameObject[] levelChunkPrefabs;
     int chunksSpawned = 0;
+    GameObject lastSpawnedMainChunkPrefab;
 
     List<GameObject> spawnedChunks = new List<GameObject>();
     float nextChunkZ = 0f;
@@ -79,6 +80,26 @@ public class LevelController : MonoBehaviour
         else
         {
             chunkToSpawn = levelChunkPrefabs[Random.Range(0, levelChunkPrefabs.Length)];
+
+            // Avoid repeating the same non-blank chunk twice in a row.
+            if (lastSpawnedMainChunkPrefab != null
+                && lastSpawnedMainChunkPrefab != blankLevelChunkPrefab
+                && chunkToSpawn == lastSpawnedMainChunkPrefab)
+            {
+                List<GameObject> eligibleChunks = new List<GameObject>();
+                foreach (GameObject prefab in levelChunkPrefabs)
+                {
+                    if (prefab != lastSpawnedMainChunkPrefab || prefab == blankLevelChunkPrefab)
+                    {
+                        eligibleChunks.Add(prefab);
+                    }
+                }
+
+                if (eligibleChunks.Count > 0)
+                {
+                    chunkToSpawn = eligibleChunks[Random.Range(0, eligibleChunks.Count)];
+                }
+            }
         }
         
         GameObject chunk = Instantiate(chunkToSpawn, new Vector3(0, 0, nextChunkZ), Quaternion.identity);
@@ -103,5 +124,6 @@ public class LevelController : MonoBehaviour
         
         nextChunkZ += chunkSize;
         chunksSpawned++;
+        lastSpawnedMainChunkPrefab = chunkToSpawn;
     }
 }

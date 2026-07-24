@@ -6,15 +6,18 @@ public class Pig : MonoBehaviour
 
     GameController gameController;
     bool isAlive = true;
+    float originalGroundY;
 
     void Awake()
     {
         gameController = GameObject.FindFirstObjectByType<GameController>();
+        originalGroundY = transform.position.y;
     }
 
     void Update()
     {
-        if (!isAlive) return;
+        if (!isAlive)
+            return;
 
         CheckGround();
         UpdateForwardMovement();
@@ -23,6 +26,7 @@ public class Pig : MonoBehaviour
         UpdateJump();
         UpdateDash();
         UpdateJumpHeight();
+        UpdateFalling();
         UpdateCooldowns();
     }
 
@@ -43,12 +47,18 @@ public class Pig : MonoBehaviour
     public float rotationAngle = 15f;
     public Transform pigModelTransform;
 
+    public float fallGravity = 20f;
+    public float maxFallSpeed = 25f;
+    public float fallAccelerationMultiplier = 2f;
     public bool isGrounded;
+
     float jumpCooldown;
     float dashCooldown;
     float dashSpeedTimer;
-    
+    float fallSpeed;
+
     bool isJumping;
+    bool hasJumpedSinceLastGrounded;
     float jumpTimer;
     Vector3 jumpStartPosition;
 
@@ -59,6 +69,7 @@ public class Pig : MonoBehaviour
         {
             currentSpeed += dashForce;
         }
+
         transform.Translate(Vector3.forward * currentSpeed * Time.deltaTime);
     }
 
@@ -76,59 +87,75 @@ public class Pig : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
         float targetTilt = -horizontalInput * tiltAngle;
         float targetRotation = horizontalInput * rotationAngle;
-        
-        Quaternion targetQuaternion = Quaternion.Euler(0, targetRotation, targetTilt);
+
+        Quaternion targetQuaternion = Quaternion.Euler(0f, targetRotation, targetTilt);
         pigModelTransform.localRotation = Quaternion.Lerp(pigModelTransform.localRotation, targetQuaternion, tiltSpeed * Time.deltaTime);
     }
 
     void UpdateJump()
     {
-        CheckGround();
-        
-        if (Input.GetKey(KeyCode.Z) && isGrounded && jumpCooldown <= 0 && !isJumping)
+        bool canGroundJump = isGrounded && jumpCooldown <= 0f && !isJumping;
+        bool canFallingJump = !isGrounded && !isJumping && !hasJumpedSinceLastGrounded && jumpCooldown <= 0f;
+
+        if (Input.GetKey(KeyCode.Z) && (canGroundJump || canFallingJump))
         {
             isJumping = true;
+            hasJumpedSinceLastGrounded = true;
             jumpTimer = 0f;
             jumpStartPosition = transform.position;
             jumpCooldown = jumpCooldownDuration;
+            fallSpeed = 0f;
         }
     }
 
     void UpdateJumpHeight()
     {
-        if (isJumping)
-        {
-            // Pause gravity while dashing
-            if (dashSpeedTimer > 0)
-                return;
+        if (!isJumping)
+            return;
 
-            jumpTimer += Time.deltaTime;
-            
-            if (jumpTimer >= jumpDuration)
-            {
-                // Jump finished
-                isJumping = false;
-                jumpTimer = 0f;
-                Vector3 pos = transform.position;
-                pos.y = jumpStartPosition.y;
-                transform.position = pos;
-            }
-            else
-            {
-                // Jump in progress - use sine curve for smooth arc
-                float jumpProgress = jumpTimer / jumpDuration;
-                float height = Mathf.Sin(jumpProgress * Mathf.PI) * jumpHeight;
-                
-                Vector3 pos = transform.position;
-                pos.y = jumpStartPosition.y + height;
-                transform.position = pos;
-            }
+        // Pause gravity while dashing
+        if (dashSpeedTimer > 0)
+            return;
+
+        jumpTimer += Time.deltaTime;
+
+        if (jumpTimer >= jumpDuration)
+        {
+            // Jump finished
+            isJumping = false;
+            jumpTimer = 0f;
+            Vector3 pos = transform.position;
+            pos.y = jumpStartPosition.y;
+            transform.position = pos;
+            return;
         }
+
+        // Jump in progress - use sine curve for smooth arc
+        float jumpProgress = jumpTimer / jumpDuration;
+        float height = Mathf.Sin(jumpProgress * Mathf.PI) * jumpHeight;
+
+        Vector3 jumpPos = transform.position;
+        jumpPos.y = jumpStartPosition.y + height;
+        transform.position = jumpPos;
+    }
+
+    void UpdateFalling()
+    {
+        if (isGrounded || isJumping)
+            return;
+
+        fallSpeed += fallGravity * fallAccelerationMultiplier * Time.deltaTime;
+        if (fallSpeed > maxFallSpeed)
+        {
+            fallSpeed = maxFallSpeed;
+        }
+
+        transform.Translate(Vector3.down * fallSpeed * Time.deltaTime, Space.World);
     }
 
     void UpdateDash()
     {
-        if (Input.GetKeyDown(KeyCode.X) && dashCooldown <= 0)
+        if (Input.GetKeyDown(KeyCode.X) && dashCooldown <= 0f)
         {
             dashSpeedTimer = dashDuration;
             dashCooldown = dashCooldownDuration;
@@ -139,20 +166,55 @@ public class Pig : MonoBehaviour
     {
         Vector3 checkPosition = transform.position + Vector3.down * (groundCheckDistance / 2f);
         Collider[] colliders = Physics.OverlapSphere(checkPosition, groundCheckDistance);
-        isGrounded = colliders.Length > 1; // More than 1 because the pig itself is included
+        isGrounded = false;
+
+        foreach (Collider collider in colliders)
+        {
+            if (collider.gameObject == gameObject)
+                continue;
+
+            if (collider.CompareTag("Ground"))
+            {
+                isGrounded = true;
+                break;
+            }
+        }
+
+        if (isGrounded)
+        {
+            fallSpeed = 0f;
+
+            if (!isJumping)
+            {
+                hasJumpedSinceLastGrounded = false;
+                SnapToOriginalGroundHeight();
+            }
+        }
+    }
+
+    void SnapToOriginalGroundHeight()
+    {
+        Vector3 pos = transform.position;
+        if (!Mathf.Approximately(pos.y, originalGroundY))
+        {
+            pos.y = originalGroundY;
+            transform.position = pos;
+        }
     }
 
     void UpdateCooldowns()
     {
-        if (jumpCooldown > 0)
+        if (jumpCooldown > 0f)
         {
             jumpCooldown -= Time.deltaTime;
         }
-        if (dashCooldown > 0)
+
+        if (dashCooldown > 0f)
         {
             dashCooldown -= Time.deltaTime;
         }
-        if (dashSpeedTimer > 0)
+
+        if (dashSpeedTimer > 0f)
         {
             dashSpeedTimer -= Time.deltaTime;
         }
@@ -168,7 +230,7 @@ public class Pig : MonoBehaviour
             gameController.GameOver();
             Debug.Log("Pig hit an obstacle!");
         }
-        
+
         if (other.CompareTag("Apple"))
         {
             Destroy(other.gameObject);
