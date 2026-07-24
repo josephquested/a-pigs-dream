@@ -74,6 +74,15 @@ public class GameController : MonoBehaviour
         UpdateTimerDisplay();
     }
 
+    public void AddScorePoints(int pointsToAdd)
+    {
+        if (isGameOver || pointsToAdd <= 0)
+            return;
+
+        score += pointsToAdd;
+        UpdateScoreDisplay();
+    }
+
     void UpdateTimer()
     {
         if (isGameOver)

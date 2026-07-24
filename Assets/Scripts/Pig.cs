@@ -254,6 +254,7 @@ public class Pig : MonoBehaviour
         {
             Destroy(other.gameObject);
             gameController.AddTime(10f);
+            gameController.AddScorePoints(1);
         }
     }
 }

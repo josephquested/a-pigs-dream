@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 
 public class LevelController : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class LevelController : MonoBehaviour
     void Update()
     {
         UpdateLevelGeneration();
+        UpdateBlankChanceDisplay();
     }
 
     // -- LEVEL -- //
@@ -37,7 +39,12 @@ public class LevelController : MonoBehaviour
     public GameObject blankLevelChunkPrefab;
     public float appleSpawnChance = 50f;
     public GameObject applePrefab;
-    public GameObject edgeChunkPrefab; 
+    public GameObject edgeChunkPrefab;
+    public TextMeshProUGUI blankChunkChanceText;
+    public int guaranteedInitialBlankChunks = 8;
+    [Range(0f, 1f)] public float startingBlankChunkChance = 0.9f;
+    [Range(0f, 1f)] public float minimumBlankChunkChance = 0.1f;
+    public float difficultyRampSpeed = 0.04f;
 
     GameObject[] levelChunkPrefabs;
     int chunksSpawned = 0;
@@ -70,37 +77,7 @@ public class LevelController : MonoBehaviour
 
     void SpawnChunk()
     {
-        GameObject chunkToSpawn;
-        
-        // Use blank chunk for first 3, then random
-        if (chunksSpawned < 8)
-        {
-            chunkToSpawn = blankLevelChunkPrefab;
-        }
-        else
-        {
-            chunkToSpawn = levelChunkPrefabs[Random.Range(0, levelChunkPrefabs.Length)];
-
-            // Avoid repeating the same non-blank chunk twice in a row.
-            if (lastSpawnedMainChunkPrefab != null
-                && lastSpawnedMainChunkPrefab != blankLevelChunkPrefab
-                && chunkToSpawn == lastSpawnedMainChunkPrefab)
-            {
-                List<GameObject> eligibleChunks = new List<GameObject>();
-                foreach (GameObject prefab in levelChunkPrefabs)
-                {
-                    if (prefab != lastSpawnedMainChunkPrefab || prefab == blankLevelChunkPrefab)
-                    {
-                        eligibleChunks.Add(prefab);
-                    }
-                }
-
-                if (eligibleChunks.Count > 0)
-                {
-                    chunkToSpawn = eligibleChunks[Random.Range(0, eligibleChunks.Count)];
-                }
-            }
-        }
+        GameObject chunkToSpawn = SelectChunkPrefab();
         
         GameObject chunk = Instantiate(chunkToSpawn, new Vector3(0, 0, nextChunkZ), Quaternion.identity);
         spawnedChunks.Add(chunk);
@@ -125,5 +102,67 @@ public class LevelController : MonoBehaviour
         nextChunkZ += chunkSize;
         chunksSpawned++;
         lastSpawnedMainChunkPrefab = chunkToSpawn;
+    }
+
+    GameObject SelectChunkPrefab()
+    {
+        if (blankLevelChunkPrefab != null && chunksSpawned < Mathf.Max(0, guaranteedInitialBlankChunks))
+        {
+            return blankLevelChunkPrefab;
+        }
+
+        float currentBlankChance = GetCurrentBlankChance();
+        bool shouldUseBlank = blankLevelChunkPrefab != null && Random.value < currentBlankChance;
+
+        if (shouldUseBlank)
+        {
+            return blankLevelChunkPrefab;
+        }
+
+        List<GameObject> candidateChunks = new List<GameObject>();
+        foreach (GameObject prefab in levelChunkPrefabs)
+        {
+            if (prefab == null || prefab == blankLevelChunkPrefab)
+                continue;
+
+            // Avoid repeating the same non-blank chunk twice in a row.
+            if (lastSpawnedMainChunkPrefab != null
+                && lastSpawnedMainChunkPrefab != blankLevelChunkPrefab
+                && prefab == lastSpawnedMainChunkPrefab)
+            {
+                continue;
+            }
+
+            candidateChunks.Add(prefab);
+        }
+
+        if (candidateChunks.Count == 0)
+        {
+            return blankLevelChunkPrefab != null ? blankLevelChunkPrefab : levelChunkPrefabs[Random.Range(0, levelChunkPrefabs.Length)];
+        }
+
+        return candidateChunks[Random.Range(0, candidateChunks.Count)];
+    }
+
+    float GetCurrentBlankChance()
+    {
+        float safeMinBlankChance = Mathf.Clamp01(minimumBlankChunkChance);
+        float safeStartBlankChance = Mathf.Clamp01(startingBlankChunkChance);
+        if (safeStartBlankChance < safeMinBlankChance)
+        {
+            safeStartBlankChance = safeMinBlankChance;
+        }
+
+        float progression = Mathf.Clamp01(chunksSpawned * Mathf.Max(0f, difficultyRampSpeed));
+        return Mathf.Lerp(safeStartBlankChance, safeMinBlankChance, progression);
+    }
+
+    void UpdateBlankChanceDisplay()
+    {
+        if (blankChunkChanceText == null)
+            return;
+
+        float chancePercent = GetCurrentBlankChance() * 100f;
+        blankChunkChanceText.text = "Blank Chunk Chance: " + chancePercent.ToString("F1") + "%";
     }
 }

@@ -54,7 +54,7 @@ public class LevelChunk : MonoBehaviour
         // Randomly determine a position within the chunk's bounds
         float randomX = Random.Range(topLeftSpawnPoint.position.x, bottomRightSpawnPoint.position.x);
         float randomZ = Random.Range(topLeftSpawnPoint.position.z, bottomRightSpawnPoint.position.z);
-        Vector3 spawnPosition = new Vector3(randomX, spawnYOffset, randomZ);
+        Vector3 spawnPosition = new Vector3(randomX, 0, randomZ);
         Vector3 prefabEuler = applePrefab.transform.rotation.eulerAngles;
         float yRotation = randomizeYRotation ? Random.Range(0f, 360f) : prefabEuler.y;
         Quaternion spawnRotation = Quaternion.Euler(prefabEuler.x, yRotation, prefabEuler.z);
