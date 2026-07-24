@@ -9,12 +9,15 @@ public class GameController : MonoBehaviour
     void Start()
     {
         timeRemaining = gameTime;
+        score = 0;
         UpdateTimerDisplay();
+        UpdateScoreDisplay();
     }
 
     void Update()
     {
         UpdateTimer();
+        UpdateScore();
         CheckForRestart();
     }
 
@@ -22,11 +25,14 @@ public class GameController : MonoBehaviour
 
     public GameObject gameOverScreen;
     public TextMeshProUGUI timerText;
+    public TextMeshProUGUI scoreText;
     public float gameTime = 60f;
 
     bool isGameOver = false;
     float timeRemaining;
     float timerTickCounter;
+    float scoreTickCounter;
+    int score;
 
     public void GameOver()
     {
@@ -65,6 +71,28 @@ public class GameController : MonoBehaviour
         if (timerText != null)
         {
             timerText.text = Mathf.Max(0, Mathf.FloorToInt(timeRemaining)).ToString();
+        }
+    }
+
+    void UpdateScore()
+    {
+        if (isGameOver)
+            return;
+
+        scoreTickCounter += Time.deltaTime;
+        if (scoreTickCounter >= 1f)
+        {
+            score += 1;
+            scoreTickCounter = 0f;
+            UpdateScoreDisplay();
+        }
+    }
+
+    void UpdateScoreDisplay()
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = score.ToString();
         }
     }
 

@@ -5,6 +5,21 @@ using LootLocker.Requests;
 
 public class LootManager : MonoBehaviour
 {
+    private static LootManager instance;
+    public static LootManager Instance => instance;
+
+    void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
     void Start()
     {
         ConnectToLootLocker();
