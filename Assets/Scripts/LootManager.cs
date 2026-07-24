@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using LootLocker.Requests;
 using TMPro;
@@ -26,7 +27,16 @@ public class LootManager : MonoBehaviour
     void Start()
     {
         ConnectToLootLocker();
+        ConfigurePlayerNameInputField();
         LoadSavedPlayerName();
+    }
+
+    void OnDisable()
+    {
+        if (playerNameInputField != null)
+        {
+            playerNameInputField.onValueChanged.RemoveListener(EnforcePlayerNameInputRules);
+        }
     }
 
     void ConnectToLootLocker()
@@ -46,6 +56,38 @@ public class LootManager : MonoBehaviour
 
     public TMP_InputField playerNameInputField;
     string playerName;
+    public string PlayerName => playerName;
+
+    void ConfigurePlayerNameInputField()
+    {
+        if (playerNameInputField == null)
+            return;
+
+        playerNameInputField.characterLimit = 10;
+        playerNameInputField.onValueChanged.RemoveListener(EnforcePlayerNameInputRules);
+        playerNameInputField.onValueChanged.AddListener(EnforcePlayerNameInputRules);
+        EnforcePlayerNameInputRules(playerNameInputField.text);
+    }
+
+    void EnforcePlayerNameInputRules(string inputText)
+    {
+        if (playerNameInputField == null)
+            return;
+
+        string sanitizedText = inputText.ToUpperInvariant();
+        if (sanitizedText.Length > 10)
+        {
+            sanitizedText = sanitizedText.Substring(0, 10);
+        }
+
+        if (sanitizedText != inputText)
+        {
+            playerNameInputField.SetTextWithoutNotify(sanitizedText);
+            playerNameInputField.caretPosition = sanitizedText.Length;
+            playerNameInputField.selectionAnchorPosition = sanitizedText.Length;
+            playerNameInputField.selectionFocusPosition = sanitizedText.Length;
+        }
+    }
 
     public void UpdatePlayerName()
     {
@@ -56,7 +98,12 @@ public class LootManager : MonoBehaviour
         if (string.IsNullOrEmpty(enteredName))
             return;
 
-        string _name = enteredName.ToUpper();
+        string _name = enteredName.ToUpperInvariant();
+        if (_name.Length > 10)
+        {
+            _name = _name.Substring(0, 10);
+        }
+
         playerName = _name;
         playerNameInputField.text = playerName;
 
@@ -85,68 +132,49 @@ public class LootManager : MonoBehaviour
         if (string.IsNullOrEmpty(savedName))
             return;
 
-        playerName = savedName;
+        playerName = savedName.ToUpperInvariant();
+        if (playerName.Length > 10)
+        {
+            playerName = playerName.Substring(0, 10);
+        }
+
         playerNameInputField.text = playerName;
     }
 
-    void AddScore()
+    public void AddScore(int score, Action<bool> onComplete)
     {
         string leaderboardKey = "leaderboard";
-        string memberID = UnityEngine.Random.Range(0, 9999).ToString();
-        int score = 1000;
+        string memberID = string.IsNullOrEmpty(playerName) ? UnityEngine.Random.Range(0, 9999).ToString() : playerName;
 
         LootLockerSDKManager.SubmitScore(memberID, score, leaderboardKey, (response) =>
         {
             if (!response.success) {
                 Debug.Log("Could not submit score!");
                 Debug.Log(response.errorData.ToString());
+                onComplete?.Invoke(false);
                 return;
             } 
             Debug.Log("Successfully submitted score!");
+            onComplete?.Invoke(true);
         
         });
     }
 
-    public void GetScores()
+    public void GetScores(Action<LootLockerLeaderboardMember[]> onScoresReceived)
     {
         string leaderboardKey = "leaderboard";
         int count = 10;
 
         LootLockerSDKManager.GetScoreList(leaderboardKey, count, 0, (response) =>
         {
-            if (response.statusCode == 200) {
-                DisplayHighScores(response.items);
-            } else {
-                print("failed to get scores");
+            if (response.statusCode == 200)
+            {
+                onScoresReceived?.Invoke(response.items);
+            }
+            else
+            {
+                Debug.Log("failed to get scores");
             }
         });
-    }
-
-    void DisplayHighScores(LootLocker.Requests.LootLockerLeaderboardMember[] items)
-    {
-        print(items[0].player.name + " : " + items[0].score);
-        // int i = 0;
-
-        // loadingHighscoresObj.SetActive(false);
-        // gameoverParent.SetActive(false);
-        // highscoresParent.SetActive(true);
-        // yourScoreText.text = playerName + ": " + score + " / 25";
-
-        // List<string> names = new List<string>();
-
-        // foreach(TextMeshProUGUI ui in highscoreUIs)
-        // {
-        //     if (i <= items.Length - 1)
-        //     {
-        //         names.Add(items[i].player.name);
-        //         ui.gameObject.SetActive(true);
-        //         ui.text = items[i].rank.ToString() + ". " + items[i].player.name + ": " + items[i].score + " / 25";
-        //     }
-
-        //     else
-        //         ui.gameObject.SetActive(false);
-
-        //     i++;
-        // }
     }
 }

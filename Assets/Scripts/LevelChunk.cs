@@ -31,9 +31,10 @@ public class LevelChunk : MonoBehaviour
             float randomX = Random.Range(topLeftSpawnPoint.position.x, bottomRightSpawnPoint.position.x);
             float randomZ = Random.Range(topLeftSpawnPoint.position.z, bottomRightSpawnPoint.position.z);
             Vector3 spawnPosition = new Vector3(randomX, 0f, randomZ);
+            Quaternion spawnRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
 
             // Instantiate the object at the determined position
-            Instantiate(objectToSpawn, spawnPosition, Quaternion.identity);
+            Instantiate(objectToSpawn, spawnPosition, spawnRotation);
         }
     }
 
@@ -46,8 +47,9 @@ public class LevelChunk : MonoBehaviour
         float randomX = Random.Range(topLeftSpawnPoint.position.x, bottomRightSpawnPoint.position.x);
         float randomZ = Random.Range(topLeftSpawnPoint.position.z, bottomRightSpawnPoint.position.z);
         Vector3 spawnPosition = new Vector3(randomX, 0f, randomZ);
+        Quaternion spawnRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
 
         // Instantiate the apple at the determined position
-        Instantiate(applePrefab, spawnPosition, Quaternion.identity);
+        Instantiate(applePrefab, spawnPosition, spawnRotation);
     }
 }

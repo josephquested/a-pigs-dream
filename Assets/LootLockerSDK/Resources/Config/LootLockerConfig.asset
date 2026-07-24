@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 182cd195a28310e479cddf7ff82822f8, type: 3}
   m_Name: LootLockerConfig
   m_EditorClassIdentifier: lootlocker.lootlockersdk.runtime::LootLocker.LootLockerConfig
-  apiKey: 
+  apiKey: dev_69d0917cf2bc4d1ebc151bacb08e4c1c
   adminToken: 
-  domainKey: 
+  domainKey: y596th6n
   game_version: 1.0.0.0
-  sdk_version: 
+  sdk_version: 8.1.1
   logLevel: 2
   prettifyJson: 1
   obfuscateLogs: 1
