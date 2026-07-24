@@ -124,6 +124,11 @@ public class Pig : MonoBehaviour
             jumpStartPosition = transform.position;
             jumpCooldown = jumpCooldownDuration;
             fallSpeed = 0f;
+
+            if (AudioController.Instance != null)
+            {
+                AudioController.Instance.PlayJump();
+            }
         }
     }
 
@@ -178,6 +183,11 @@ public class Pig : MonoBehaviour
         {
             dashSpeedTimer = dashDuration;
             dashCooldown = dashCooldownDuration;
+
+            if (AudioController.Instance != null)
+            {
+                AudioController.Instance.PlayDash();
+            }
         }
     }
 
@@ -251,12 +261,36 @@ public class Pig : MonoBehaviour
             if (dashSpeedTimer > 0f)
             {
                 Destroy(other.gameObject);
+
+                if (AudioController.Instance != null)
+                {
+                    AudioController.Instance.PlayBushBreak();
+                }
             }
             else
             {
                 isAlive = false;
                 gameController.GameOver();
                 Debug.Log("Pig hit a bush without dashing!");
+
+                if (AudioController.Instance != null)
+                {
+                    AudioController.Instance.PlayCrashDeath();
+                }
+            }
+
+            return;
+        }
+
+        if (other.CompareTag("Water"))
+        {
+            isAlive = false;
+            gameController.GameOver();
+            Debug.Log("Pig fell into water!");
+
+            if (AudioController.Instance != null)
+            {
+                AudioController.Instance.PlayWaterDeath();
             }
 
             return;
@@ -267,6 +301,11 @@ public class Pig : MonoBehaviour
             isAlive = false;
             gameController.GameOver();
             Debug.Log("Pig hit an obstacle!");
+
+            if (AudioController.Instance != null)
+            {
+                AudioController.Instance.PlayCrashDeath();
+            }
         }
 
         if (other.CompareTag("Apple"))
@@ -274,6 +313,11 @@ public class Pig : MonoBehaviour
             Destroy(other.gameObject);
             gameController.AddTime(10f);
             gameController.AddScorePoints(1);
+
+            if (AudioController.Instance != null)
+            {
+                AudioController.Instance.PlayApplePickup();
+            }
         }
     }
 }
