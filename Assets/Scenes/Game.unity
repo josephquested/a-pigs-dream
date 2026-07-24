@@ -1007,8 +1007,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 696852e90628bc5488342a8d43161aef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Pig
-  forwardSpeed: 15
-  sideSpeed: 10
+  forwardSpeed: 18
+  sideSpeed: 13
   jumpHeight: 2
   jumpDuration: 0.6
   groundCheckDistance: 0.4
@@ -1019,7 +1019,7 @@ MonoBehaviour:
   dashCooldownDuration: 0.5
   tiltAngle: 10
   tiltSpeed: 15
-  rotationAngle: 25
+  rotationAngle: 30
   pigModelTransform: {fileID: 2128811424}
   fallGravity: 20
   maxFallSpeed: 25
@@ -3627,8 +3627,8 @@ MonoBehaviour:
   blankChunkChanceText: {fileID: 2105365779}
   guaranteedInitialBlankChunks: 4
   startingBlankChunkChance: 0.7
-  minimumBlankChunkChance: 0.1
-  difficultyRampSpeed: 0.005
+  minimumBlankChunkChance: 0.08
+  difficultyRampSpeed: 0.007
 --- !u!1 &2105365777
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 579273856058179412}
   - component: {fileID: -8974283562748979700}
   m_Layer: 0
-  m_Name: Rock Level Chunk
+  m_Name: Mix Chunk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -50,6 +50,8 @@ MonoBehaviour:
   topLeftSpawnPoint: {fileID: 7748016359527507851}
   bottomRightSpawnPoint: {fileID: 1551315387584276365}
   spawnableObjects:
+  - {fileID: 2414141764177347763, guid: 24498b94d3d8d5e4186fc04c48d18f19, type: 3}
+  - {fileID: 2414141764177347763, guid: dd9afbd3c2fc00b41b3befc883422075, type: 3}
   - {fileID: 8791421196450826315, guid: ba69c5021b71be64493c0d7f24355200, type: 3}
   minObjectsToSpawn: 2
   maxObjectsToSpawn: 4
@@ -192,7 +194,7 @@ Transform:
   m_GameObject: {fileID: 8578020014613677330}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.18, y: 0, z: -4.29}
+  m_LocalPosition: {x: 4.19, y: 0, z: -4.42}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -223,7 +225,7 @@ Transform:
   m_GameObject: {fileID: 9166158452781533688}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.26, y: 0, z: 4.22}
+  m_LocalPosition: {x: -4.17, y: 0, z: 4.02}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

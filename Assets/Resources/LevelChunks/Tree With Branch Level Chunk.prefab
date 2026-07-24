@@ -52,7 +52,7 @@ MonoBehaviour:
   spawnableObjects:
   - {fileID: 2414141764177347763, guid: 24498b94d3d8d5e4186fc04c48d18f19, type: 3}
   minObjectsToSpawn: 1
-  maxObjectsToSpawn: 1
+  maxObjectsToSpawn: 2
   randomizeYRotation: 1
   spawnYOffset: 0
 --- !u!1 &3311261860323820430
