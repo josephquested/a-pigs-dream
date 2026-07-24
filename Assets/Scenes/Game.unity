@@ -1016,6 +1016,9 @@ MonoBehaviour:
   tiltSpeed: 15
   rotationAngle: 25
   pigModelTransform: {fileID: 2128811424}
+  fallGravity: 20
+  maxFallSpeed: 25
+  fallAccelerationMultiplier: 2
   isGrounded: 1
 --- !u!54 &505777437
 Rigidbody:
@@ -3613,7 +3616,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelController
   chunksAhead: 20
   blankLevelChunkPrefab: {fileID: 1828136827953393609, guid: deac5430db3ff0e43a9aa126cec6817a, type: 3}
-  appleSpawnChance: 5
+  appleSpawnChance: 15
   applePrefab: {fileID: 2630773314890223559, guid: e4f00bb8d4706414eb87ea33289f781c, type: 3}
   edgeChunkPrefab: {fileID: 1921689970243370568, guid: 73bd5b025c2d33e43aba0f263a011727, type: 3}
 --- !u!1 &2128811423 stripped

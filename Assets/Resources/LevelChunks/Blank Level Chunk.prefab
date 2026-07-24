@@ -81,6 +81,8 @@ MonoBehaviour:
   topLeftSpawnPoint: {fileID: 1192235955819503229}
   bottomRightSpawnPoint: {fileID: 2834292026458156341}
   spawnableObjects: []
+  minObjectsToSpawn: 0
+  maxObjectsToSpawn: 0
 --- !u!1 &3311261860323820430
 GameObject:
   m_ObjectHideFlags: 0

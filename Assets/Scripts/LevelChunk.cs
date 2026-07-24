@@ -14,13 +14,19 @@ public class LevelChunk : MonoBehaviour
     public Transform topLeftSpawnPoint;
     public Transform bottomRightSpawnPoint;
     public GameObject[] spawnableObjects;
+    public int minObjectsToSpawn = 0;
+    public int maxObjectsToSpawn = 2;
+    public bool randomizeYRotation = true;
+    public float spawnYOffset = 0f;
 
     public void SpawnObjects()
     {
         if (spawnableObjects.Length == 0)
             return;
 
-        int numberOfObjectsToSpawn = Random.Range(0, 3); // Randomly spawn 1 to 3 objects
+        int minSpawn = Mathf.Max(0, minObjectsToSpawn);
+        int maxSpawn = Mathf.Max(minSpawn, maxObjectsToSpawn);
+        int numberOfObjectsToSpawn = Random.Range(minSpawn, maxSpawn + 1);
 
         for (int i = 0; i < numberOfObjectsToSpawn; i++)
         {
@@ -30,8 +36,10 @@ public class LevelChunk : MonoBehaviour
             // Randomly determine a position within the chunk's bounds
             float randomX = Random.Range(topLeftSpawnPoint.position.x, bottomRightSpawnPoint.position.x);
             float randomZ = Random.Range(topLeftSpawnPoint.position.z, bottomRightSpawnPoint.position.z);
-            Vector3 spawnPosition = new Vector3(randomX, 0f, randomZ);
-            Quaternion spawnRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+            Vector3 spawnPosition = new Vector3(randomX, spawnYOffset, randomZ);
+            Quaternion spawnRotation = randomizeYRotation
+                ? Quaternion.Euler(0f, Random.Range(0f, 360f), 0f)
+                : Quaternion.identity;
 
             // Instantiate the object at the determined position
             Instantiate(objectToSpawn, spawnPosition, spawnRotation);
@@ -46,8 +54,10 @@ public class LevelChunk : MonoBehaviour
         // Randomly determine a position within the chunk's bounds
         float randomX = Random.Range(topLeftSpawnPoint.position.x, bottomRightSpawnPoint.position.x);
         float randomZ = Random.Range(topLeftSpawnPoint.position.z, bottomRightSpawnPoint.position.z);
-        Vector3 spawnPosition = new Vector3(randomX, 0f, randomZ);
-        Quaternion spawnRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+        Vector3 spawnPosition = new Vector3(randomX, spawnYOffset, randomZ);
+        Quaternion spawnRotation = randomizeYRotation
+            ? Quaternion.Euler(0f, Random.Range(0f, 360f), 0f)
+            : Quaternion.identity;
 
         // Instantiate the apple at the determined position
         Instantiate(applePrefab, spawnPosition, spawnRotation);

@@ -81,6 +81,10 @@ MonoBehaviour:
   topLeftSpawnPoint: {fileID: 1192235955819503229}
   bottomRightSpawnPoint: {fileID: 2834292026458156341}
   spawnableObjects: []
+  minObjectsToSpawn: 0
+  maxObjectsToSpawn: 0
+  randomizeYRotation: 1
+  spawnYOffset: 0
 --- !u!1 &4732798444648618886
 GameObject:
   m_ObjectHideFlags: 0
@@ -110,7 +114,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: -1.5259, z: 0.0505}
-  m_LocalScale: {x: 10, y: 0.7795199, z: 5}
+  m_LocalScale: {x: 10, y: 0.7795199, z: 5.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 579273856058179412}

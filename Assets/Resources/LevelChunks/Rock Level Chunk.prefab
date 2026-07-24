@@ -51,6 +51,8 @@ MonoBehaviour:
   bottomRightSpawnPoint: {fileID: 1551315387584276365}
   spawnableObjects:
   - {fileID: 8791421196450826315, guid: ba69c5021b71be64493c0d7f24355200, type: 3}
+  minObjectsToSpawn: 1
+  maxObjectsToSpawn: 3
 --- !u!1 &3311261860323820430
 GameObject:
   m_ObjectHideFlags: 0
