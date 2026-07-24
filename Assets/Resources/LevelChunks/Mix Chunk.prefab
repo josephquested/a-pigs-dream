@@ -53,6 +53,7 @@ MonoBehaviour:
   - {fileID: 2414141764177347763, guid: 24498b94d3d8d5e4186fc04c48d18f19, type: 3}
   - {fileID: 2414141764177347763, guid: dd9afbd3c2fc00b41b3befc883422075, type: 3}
   - {fileID: 8791421196450826315, guid: ba69c5021b71be64493c0d7f24355200, type: 3}
+  - {fileID: 7581134556946188219, guid: dbbfc6954642a504fbe30237646d3459, type: 3}
   minObjectsToSpawn: 2
   maxObjectsToSpawn: 4
   randomizeYRotation: 1
