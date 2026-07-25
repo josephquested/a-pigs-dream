@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using TMPro;
 
 public class LevelController : MonoBehaviour
 {
@@ -30,7 +29,6 @@ public class LevelController : MonoBehaviour
     void Update()
     {
         UpdateLevelGeneration();
-        UpdateBlankChanceDisplay();
     }
 
     // -- LEVEL -- //
@@ -42,7 +40,6 @@ public class LevelController : MonoBehaviour
     public float appleSpawnChance = 50f;
     public GameObject applePrefab;
     public GameObject edgeChunkPrefab;
-    public TextMeshProUGUI blankChunkChanceText;
     public int guaranteedInitialBlankChunks = 8;
     public float chunksBehindToKeep = 2f;
     [Range(0f, 1f)] public float startingBlankChunkChance = 0.9f;
@@ -175,14 +172,5 @@ public class LevelController : MonoBehaviour
 
         float progression = Mathf.Clamp01(chunksSpawned * Mathf.Max(0f, difficultyRampSpeed));
         return Mathf.Lerp(safeStartBlankChance, safeMinBlankChance, progression);
-    }
-
-    void UpdateBlankChanceDisplay()
-    {
-        if (blankChunkChanceText == null)
-            return;
-
-        float chancePercent = GetCurrentBlankChance() * 100f;
-        blankChunkChanceText.text = "Blank Chunk Chance: " + chancePercent.ToString("F1") + "%";
     }
 }
