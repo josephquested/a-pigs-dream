@@ -50,6 +50,7 @@ public class Pig : MonoBehaviour
     public float rotationAngle = 15f;
     public Transform pigModelTransform;
     public Animator pigAnimator;
+    public ParticleSystem dashParticleSystem;
 
     public float fallGravity = 20f;
     public float maxFallSpeed = 25f;
@@ -199,6 +200,11 @@ public class Pig : MonoBehaviour
         {
             dashSpeedTimer = dashDuration;
             dashCooldown = dashCooldownDuration;
+
+            if (dashParticleSystem != null)
+            {
+                dashParticleSystem.Play();
+            }
 
             if (AudioController.Instance != null)
             {
