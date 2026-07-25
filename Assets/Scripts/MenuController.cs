@@ -5,10 +5,12 @@ public class MenuController : MonoBehaviour
 {
     // -- SYSTEM -- //
 
+    public GameObject startingParent;
     public GameObject nameEntryParent;
     public GameObject startGameParent;
 
     bool canStartGame;
+    bool nameEntryFlowStarted;
 
     void Start()
     {
@@ -19,6 +21,9 @@ public class MenuController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
         {
+            if (!nameEntryFlowStarted)
+                return;
+
             if (!canStartGame)
             {
                 SubmitPlayerName();
@@ -27,6 +32,20 @@ public class MenuController : MonoBehaviour
 
             SceneManager.LoadScene("Game");
         }
+    }
+
+    public void OpenNameEntry()
+    {
+        nameEntryFlowStarted = true;
+
+        if (startingParent != null)
+            startingParent.SetActive(false);
+
+        if (nameEntryParent != null)
+            nameEntryParent.SetActive(true);
+
+        if (startGameParent != null)
+            startGameParent.SetActive(false);
     }
 
     void SubmitPlayerName()

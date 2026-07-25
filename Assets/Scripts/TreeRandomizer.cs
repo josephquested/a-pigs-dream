@@ -8,7 +8,7 @@ public class TreeRandomizer : MonoBehaviour
     void Awake()
     {
         Vector3 position = transform.position;
-        position.y = Random.Range(-2f, 0f);
+        position.y = Random.Range(-1.5f, 0f);
         transform.position = position;
 
         Vector3 scale = transform.localScale;
