@@ -58,6 +58,7 @@ MonoBehaviour:
   maxObjectsToSpawn: 4
   randomizeYRotation: 1
   spawnYOffset: 0
+  isWaterChunk: 0
 --- !u!1 &3311261860323820430
 GameObject:
   m_ObjectHideFlags: 0
@@ -125,7 +126,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: e16e071ec24df4ebb911b67eb66de33c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
