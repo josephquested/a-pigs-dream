@@ -63,6 +63,11 @@ public class Pig : MonoBehaviour
     public float fallAccelerationMultiplier = 2f;
     public bool isGrounded;
 
+    [Header("DEATH")]
+    public float crashBackwardDistance = 3f;
+    public float crashUpwardDistance = 4f;
+    public float crashSpinRevolutions = 2f;
+
     float jumpCooldown;
     float dashCooldown;
     float dashSpeedTimer;
@@ -297,14 +302,7 @@ public class Pig : MonoBehaviour
             }
             else
             {
-                isAlive = false;
-                gameController.GameOver();
-                Debug.Log("Pig hit a bush without dashing!");
-
-                if (AudioController.Instance != null)
-                {
-                    AudioController.Instance.PlayCrashDeath();
-                }
+                TriggerCrashDeath("Pig hit a bush without dashing!");
             }
 
             return;
@@ -322,7 +320,10 @@ public class Pig : MonoBehaviour
             float shrinkDuration = gameController != null ? Mathf.Max(0f, gameController.gameOverScreenDelay) : 1f;
             StartCoroutine(ShrinkOnWaterDeath(shrinkDuration));
 
-            gameController.GameOver();
+            if (gameController != null)
+            {
+                gameController.GameOver();
+            }
             Debug.Log("Pig fell into water!");
 
             if (AudioController.Instance != null)
@@ -335,14 +336,7 @@ public class Pig : MonoBehaviour
 
         if (other.CompareTag("Obstacle"))
         {
-            isAlive = false;
-            gameController.GameOver();
-            Debug.Log("Pig hit an obstacle!");
-
-            if (AudioController.Instance != null)
-            {
-                AudioController.Instance.PlayCrashDeath();
-            }
+            TriggerCrashDeath("Pig hit an obstacle!");
         }
 
         if (other.CompareTag("Apple"))
@@ -356,6 +350,29 @@ public class Pig : MonoBehaviour
                 AudioController.Instance.PlayApplePickup();
             }
         }
+    }
+
+    void TriggerCrashDeath(string debugMessage)
+    {
+        if (!isAlive)
+            return;
+
+        isAlive = false;
+
+        if (gameController != null)
+        {
+            gameController.GameOver();
+        }
+
+        Debug.Log(debugMessage);
+
+        if (AudioController.Instance != null)
+        {
+            AudioController.Instance.PlayCrashDeath();
+        }
+
+        float crashDuration = gameController != null ? Mathf.Max(0f, gameController.gameOverScreenDelay) : 1f;
+        StartCoroutine(PlayCrashDeathAnimation(crashDuration));
     }
 
     IEnumerator ShrinkOnWaterDeath(float duration)
@@ -433,5 +450,38 @@ public class Pig : MonoBehaviour
             color.a = 0f;
             fadeMaterials[i].SetColor(fadeColorPropertyIds[i], color);
         }
+    }
+
+    IEnumerator PlayCrashDeathAnimation(float duration)
+    {
+        Vector3 startPosition = transform.position;
+        Quaternion startRotation = transform.rotation;
+        Vector3 backwardDirection = -transform.forward;
+
+        if (duration <= 0f)
+        {
+            transform.position = startPosition + backwardDirection * crashBackwardDistance + Vector3.up * crashUpwardDistance;
+            transform.rotation = startRotation * Quaternion.Euler(-360f * crashSpinRevolutions, 0f, 0f);
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+
+            transform.position = startPosition
+                + backwardDirection * (crashBackwardDistance * t)
+                + Vector3.up * (crashUpwardDistance * t);
+
+            float spinAngle = -360f * crashSpinRevolutions * t;
+            transform.rotation = startRotation * Quaternion.Euler(spinAngle, 0f, 0f);
+
+            yield return null;
+        }
+
+        transform.position = startPosition + backwardDirection * crashBackwardDistance + Vector3.up * crashUpwardDistance;
+        transform.rotation = startRotation * Quaternion.Euler(-360f * crashSpinRevolutions, 0f, 0f);
     }
 }
