@@ -14,10 +14,7 @@ public class DisableShadowsOnStartup : MonoBehaviour
             if (light == null)
                 continue;
 
-            if (light.lightmapBakeType == LightmapBakeType.Realtime || light.lightmapBakeType == LightmapBakeType.Mixed)
-            {
-                light.enabled = false;
-            }
+            light.enabled = false;
         }
     }
 }

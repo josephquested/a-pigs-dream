@@ -8717,7 +8717,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef0dc8d661748fe4e87e8b3ab6cab5ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelController
-  chunksAhead: 20
+  chunksAhead: 7
   blankLevelChunkPrefab: {fileID: 1828136827953393609, guid: deac5430db3ff0e43a9aa126cec6817a, type: 3}
   waterChunkPrefab: {fileID: 1828136827953393609, guid: 15c70ee631f29a04387a0a8ce3557a0e, type: 3}
   fireflyParticles: {fileID: 5563946577678197634, guid: 6f1fd7d512385bf4eb2048ddc304c192, type: 3}

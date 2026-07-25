@@ -44,6 +44,7 @@ public class LevelController : MonoBehaviour
     public GameObject edgeChunkPrefab;
     public TextMeshProUGUI blankChunkChanceText;
     public int guaranteedInitialBlankChunks = 8;
+    public float chunksBehindToKeep = 2f;
     [Range(0f, 1f)] public float startingBlankChunkChance = 0.9f;
     [Range(0f, 1f)] public float minimumBlankChunkChance = 0.1f;
     public float difficultyRampSpeed = 0.04f;
@@ -69,7 +70,7 @@ public class LevelController : MonoBehaviour
         // Delete chunks behind the player
         for (int i = spawnedChunks.Count - 1; i >= 0; i--)
         {
-            if (spawnedChunks[i].transform.position.z < playerZ - (chunkSize * 2))
+            if (spawnedChunks[i].transform.position.z < playerZ - (chunkSize * chunksBehindToKeep))
             {
                 Destroy(spawnedChunks[i]);
                 spawnedChunks.RemoveAt(i);

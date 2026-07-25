@@ -19,6 +19,7 @@ public class LevelChunk : MonoBehaviour
     public bool randomizeYRotation = true;
     public float spawnYOffset = 0f;
     public bool isWaterChunk = false;
+    public bool disableSpawnedObjectColliders = false;
 
     public void SpawnObjects()
     {
@@ -43,7 +44,8 @@ public class LevelChunk : MonoBehaviour
             Quaternion spawnRotation = Quaternion.Euler(prefabEuler.x, yRotation, prefabEuler.z);
 
             // Parent spawned objects to this chunk so cleanup happens with the chunk.
-            Instantiate(objectToSpawn, spawnPosition, spawnRotation, transform);
+            GameObject spawnedObject = Instantiate(objectToSpawn, spawnPosition, spawnRotation, transform);
+            DisableCollidersIfNeeded(spawnedObject);
         }
     }
 
@@ -61,6 +63,19 @@ public class LevelChunk : MonoBehaviour
         Quaternion spawnRotation = Quaternion.Euler(prefabEuler.x, yRotation, prefabEuler.z);
 
         // Parent spawned apples to this chunk so cleanup happens with the chunk.
-        Instantiate(applePrefab, spawnPosition, spawnRotation, transform);
+        GameObject spawnedApple = Instantiate(applePrefab, spawnPosition, spawnRotation, transform);
+        DisableCollidersIfNeeded(spawnedApple);
+    }
+
+    void DisableCollidersIfNeeded(GameObject spawnedObject)
+    {
+        if (!disableSpawnedObjectColliders || spawnedObject == null)
+            return;
+
+        Collider[] colliders = spawnedObject.GetComponentsInChildren<Collider>(true);
+        foreach (Collider collider in colliders)
+        {
+            collider.enabled = false;
+        }
     }
 }
