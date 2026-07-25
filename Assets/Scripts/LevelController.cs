@@ -38,6 +38,7 @@ public class LevelController : MonoBehaviour
     public int chunksAhead = 10;
     public GameObject blankLevelChunkPrefab;
     public GameObject waterChunkPrefab;
+    public GameObject fireflyParticles;
     public float appleSpawnChance = 50f;
     public GameObject applePrefab;
     public GameObject edgeChunkPrefab;
@@ -82,6 +83,13 @@ public class LevelController : MonoBehaviour
         
         GameObject chunk = Instantiate(chunkToSpawn, new Vector3(0, 0, nextChunkZ), Quaternion.identity);
         spawnedChunks.Add(chunk);
+
+        if (fireflyParticles != null)
+        {
+            GameObject fireflies = Instantiate(fireflyParticles, chunk.transform);
+            fireflies.transform.localPosition = Vector3.zero;
+            fireflies.transform.localRotation = Quaternion.identity;
+        }
 
         LevelChunk levelChunk = chunk.GetComponent<LevelChunk>();
         bool isWaterChunk = levelChunk != null && levelChunk.isWaterChunk;

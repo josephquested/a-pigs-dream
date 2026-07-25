@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1084137912983902606}
   - component: {fileID: 3131437928308067963}
+  - component: {fileID: 86847604958413274}
   m_Layer: 0
   m_Name: Loot Manager
   m_TagString: Untagged
@@ -44,3 +45,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d419c11fdfa7bf649889272753014d32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootManager
+  playerNameInputField: {fileID: 0}
+--- !u!114 &86847604958413274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4156982011910151082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 932c692baec7cd44a8e3365724142b45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DisableShadowsOnStartup
