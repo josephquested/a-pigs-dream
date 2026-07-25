@@ -42,7 +42,8 @@ public class LevelController : MonoBehaviour
     public GameObject edgeChunkPrefab;
 
     public GameObject rightTurningChunkPrefab;
-    [Range(0f, 100f)] public float rightTurnChunkChance = 20f;
+    public GameObject leftTurningChunkPrefab;
+    [Range(0f, 100f)] public float turnChunkChance = 20f;
     public int minChunksBetweenRightTurns = 8;
     public int blankChunksAfterRightTurn = 1;
 
@@ -55,8 +56,8 @@ public class LevelController : MonoBehaviour
     GameObject[] levelChunkPrefabs;
     int chunksSpawned = 0;
     GameObject lastSpawnedMainChunkPrefab;
-    int chunksSpawnedAtLastRightTurn = int.MinValue / 2;
-    bool pendingRightTurnAfterBlank = false;
+    int chunksSpawnedAtLastTurn = int.MinValue / 2;
+    int pendingTurnDirection = 0;
     int forcedBlankChunksAfterTurnRemaining = 0;
     float currentLaneCenterX = 0f;
 
@@ -89,6 +90,10 @@ public class LevelController : MonoBehaviour
     {
         GameObject chunkToSpawn = SelectChunkPrefab();
         bool isRightTurnChunk = rightTurningChunkPrefab != null && chunkToSpawn == rightTurningChunkPrefab;
+        bool isLeftTurnChunk = leftTurningChunkPrefab != null && chunkToSpawn == leftTurningChunkPrefab;
+        bool isTurnChunk = isRightTurnChunk || isLeftTurnChunk;
+        int turnDirection = isRightTurnChunk ? 1 : (isLeftTurnChunk ? -1 : 0);
+
         float spawnX = currentLaneCenterX;
         
         GameObject chunk = Instantiate(chunkToSpawn, new Vector3(spawnX, 0, nextChunkZ), Quaternion.identity);
@@ -116,7 +121,19 @@ public class LevelController : MonoBehaviour
         if (sideChunkPrefab != null)
         {
             float leftEdgeX = spawnX - chunkSize;
-            float rightEdgeX = isRightTurnChunk ? spawnX + (2f * chunkSize) : spawnX + chunkSize;
+            float rightEdgeX = spawnX + chunkSize;
+
+            if (isTurnChunk)
+            {
+                if (turnDirection > 0)
+                {
+                    rightEdgeX = spawnX + (2f * chunkSize);
+                }
+                else if (turnDirection < 0)
+                {
+                    leftEdgeX = spawnX - (2f * chunkSize);
+                }
+            }
 
             GameObject leftEdge = Instantiate(sideChunkPrefab, new Vector3(leftEdgeX, 0, nextChunkZ), Quaternion.identity);
             GameObject rightEdge = Instantiate(sideChunkPrefab, new Vector3(rightEdgeX, 0, nextChunkZ), Quaternion.Euler(0, 180f, 0));
@@ -124,28 +141,28 @@ public class LevelController : MonoBehaviour
             spawnedChunks.Add(rightEdge);
         }
 
-        // Transition into the right lane by placing a blank connector chunk at +X on the same Z.
-        if (isRightTurnChunk)
+        // Transition into the turned lane by placing a blank connector chunk at +/-X on the same Z.
+        if (isTurnChunk)
         {
-            chunksSpawnedAtLastRightTurn = chunksSpawned;
-            pendingRightTurnAfterBlank = false;
+            chunksSpawnedAtLastTurn = chunksSpawned;
+            pendingTurnDirection = 0;
             forcedBlankChunksAfterTurnRemaining = Mathf.Max(0, blankChunksAfterRightTurn);
 
             if (blankLevelChunkPrefab != null)
             {
                 GameObject transitionBlank = Instantiate(
                     blankLevelChunkPrefab,
-                    new Vector3(spawnX + chunkSize, 0, nextChunkZ),
+                    new Vector3(spawnX + (chunkSize * turnDirection), 0, nextChunkZ),
                     Quaternion.identity
                 );
                 spawnedChunks.Add(transitionBlank);
             }
             else
             {
-                Debug.LogWarning("Right turn spawned but blankLevelChunkPrefab is missing, so no transition blank was placed.");
+                Debug.LogWarning("Turn chunk spawned but blankLevelChunkPrefab is missing, so no transition blank was placed.");
             }
 
-            currentLaneCenterX += chunkSize;
+            currentLaneCenterX += chunkSize * turnDirection;
         }
         
         // Determine if apple should spawn based on chance
@@ -179,31 +196,49 @@ public class LevelController : MonoBehaviour
         }
 
         int safeMinChunksBetweenRightTurns = Mathf.Max(0, minChunksBetweenRightTurns);
-        bool rightTurnOffCooldown = (chunksSpawned - chunksSpawnedAtLastRightTurn) > safeMinChunksBetweenRightTurns;
+        bool turnOffCooldown = (chunksSpawned - chunksSpawnedAtLastTurn) > safeMinChunksBetweenRightTurns;
 
-        if (pendingRightTurnAfterBlank && rightTurningChunkPrefab != null && rightTurnOffCooldown)
+        if (pendingTurnDirection != 0 && turnOffCooldown)
         {
-            return rightTurningChunkPrefab;
-        }
-
-        if (pendingRightTurnAfterBlank && !rightTurnOffCooldown)
-        {
-            pendingRightTurnAfterBlank = false;
-        }
-
-        bool canSpawnRightTurn = rightTurningChunkPrefab != null
-            && rightTurnOffCooldown
-            && Random.Range(0f, 100f) < rightTurnChunkChance;
-        if (canSpawnRightTurn)
-        {
-            bool previousChunkWasBlank = lastSpawnedMainChunkPrefab == blankLevelChunkPrefab;
-            if (!previousChunkWasBlank && blankLevelChunkPrefab != null)
+            int resolvedPendingDirection;
+            GameObject pendingTurnPrefab = GetTurnPrefabForDirection(pendingTurnDirection, out resolvedPendingDirection);
+            if (pendingTurnPrefab != null)
             {
-                pendingRightTurnAfterBlank = true;
-                return blankLevelChunkPrefab;
+                pendingTurnDirection = resolvedPendingDirection;
+                return pendingTurnPrefab;
             }
 
-            return rightTurningChunkPrefab;
+            pendingTurnDirection = 0;
+        }
+
+        if (pendingTurnDirection != 0 && !turnOffCooldown)
+        {
+            pendingTurnDirection = 0;
+        }
+
+        bool canSpawnTurn = HasAnyTurnPrefab()
+            && turnOffCooldown
+            && Random.Range(0f, 100f) < turnChunkChance;
+        if (canSpawnTurn)
+        {
+            int selectedTurnDirection;
+            GameObject selectedTurnPrefab;
+            bool hasChosenTurn = TryChooseRandomTurn(out selectedTurnDirection, out selectedTurnPrefab);
+            if (!hasChosenTurn)
+            {
+                pendingTurnDirection = 0;
+            }
+            else
+            {
+                bool previousChunkWasBlank = lastSpawnedMainChunkPrefab == blankLevelChunkPrefab;
+                if (!previousChunkWasBlank && blankLevelChunkPrefab != null)
+                {
+                    pendingTurnDirection = selectedTurnDirection;
+                    return blankLevelChunkPrefab;
+                }
+
+                return selectedTurnPrefab;
+            }
         }
 
         float currentBlankChance = GetCurrentBlankChance();
@@ -237,6 +272,74 @@ public class LevelController : MonoBehaviour
         }
 
         return candidateChunks[Random.Range(0, candidateChunks.Count)];
+    }
+
+    bool HasAnyTurnPrefab()
+    {
+        return rightTurningChunkPrefab != null || leftTurningChunkPrefab != null;
+    }
+
+    GameObject GetTurnPrefabForDirection(int preferredDirection, out int resolvedDirection)
+    {
+        resolvedDirection = 0;
+
+        if (preferredDirection >= 0 && rightTurningChunkPrefab != null)
+        {
+            resolvedDirection = 1;
+            return rightTurningChunkPrefab;
+        }
+
+        if (preferredDirection <= 0 && leftTurningChunkPrefab != null)
+        {
+            resolvedDirection = -1;
+            return leftTurningChunkPrefab;
+        }
+
+        if (rightTurningChunkPrefab != null)
+        {
+            resolvedDirection = 1;
+            return rightTurningChunkPrefab;
+        }
+
+        if (leftTurningChunkPrefab != null)
+        {
+            resolvedDirection = -1;
+            return leftTurningChunkPrefab;
+        }
+
+        return null;
+    }
+
+    bool TryChooseRandomTurn(out int direction, out GameObject turnPrefab)
+    {
+        direction = 0;
+        turnPrefab = null;
+
+        bool hasRight = rightTurningChunkPrefab != null;
+        bool hasLeft = leftTurningChunkPrefab != null;
+
+        if (hasRight && hasLeft)
+        {
+            direction = Random.value < 0.5f ? -1 : 1;
+            turnPrefab = direction > 0 ? rightTurningChunkPrefab : leftTurningChunkPrefab;
+            return true;
+        }
+
+        if (hasRight)
+        {
+            direction = 1;
+            turnPrefab = rightTurningChunkPrefab;
+            return true;
+        }
+
+        if (hasLeft)
+        {
+            direction = -1;
+            turnPrefab = leftTurningChunkPrefab;
+            return true;
+        }
+
+        return false;
     }
 
     float GetCurrentBlankChance()

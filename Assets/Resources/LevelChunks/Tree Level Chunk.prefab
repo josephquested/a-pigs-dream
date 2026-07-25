@@ -51,11 +51,12 @@ MonoBehaviour:
   bottomRightSpawnPoint: {fileID: 1551315387584276365}
   spawnableObjects:
   - {fileID: 2414141764177347763, guid: dd9afbd3c2fc00b41b3befc883422075, type: 3}
-  minObjectsToSpawn: 2
-  maxObjectsToSpawn: 5
+  minObjectsToSpawn: 1
+  maxObjectsToSpawn: 4
   randomizeYRotation: 1
   spawnYOffset: 0
   isWaterChunk: 0
+  disableSpawnedObjectColliders: 0
 --- !u!1 &3311261860323820430
 GameObject:
   m_ObjectHideFlags: 0
