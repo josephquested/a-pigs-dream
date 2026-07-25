@@ -9,6 +9,7 @@ TagManager:
   - Apple
   - Ground
   - Bush
+  - Water
   layers:
   - Default
   - TransparentFX

@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 7684758307726730824}
   m_Layer: 0
   m_Name: Water
-  m_TagString: Obstacle
+  m_TagString: Water
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
