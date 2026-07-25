@@ -51,7 +51,7 @@ MonoBehaviour:
   bottomRightSpawnPoint: {fileID: 1551315387584276365}
   spawnableObjects:
   - {fileID: 7126778452872356071, guid: 0e4d617efc04c8b4f9fa930e4e6a7a8f, type: 3}
-  - {fileID: 7126778452872356071, guid: 3833476e841759341bad18ef8e943196, type: 3}
+  - {fileID: 7126778452872356071, guid: b632bb0ff50bb6446b7ae6044bcc1ca9, type: 3}
   minObjectsToSpawn: 1
   maxObjectsToSpawn: 2
   randomizeYRotation: 1
