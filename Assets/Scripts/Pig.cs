@@ -20,6 +20,7 @@ public class Pig : MonoBehaviour
             return;
 
         CheckGround();
+        UpdateAnimationState();
         UpdateSpeedProgression();
         UpdateForwardMovement();
         UpdateSideMovement();
@@ -48,6 +49,7 @@ public class Pig : MonoBehaviour
     public float tiltSpeed = 5f;
     public float rotationAngle = 15f;
     public Transform pigModelTransform;
+    public Animator pigAnimator;
 
     public float fallGravity = 20f;
     public float maxFallSpeed = 25f;
@@ -63,6 +65,7 @@ public class Pig : MonoBehaviour
 
     bool isJumping;
     bool hasJumpedSinceLastGrounded;
+    string currentAnimationName;
     float jumpTimer;
     Vector3 jumpStartPosition;
 
@@ -109,6 +112,19 @@ public class Pig : MonoBehaviour
 
         Quaternion targetQuaternion = Quaternion.Euler(0f, targetRotation, targetTilt);
         pigModelTransform.localRotation = Quaternion.Lerp(pigModelTransform.localRotation, targetQuaternion, tiltSpeed * Time.deltaTime);
+    }
+
+    void UpdateAnimationState()
+    {
+        if (pigAnimator == null)
+            return;
+
+        string targetAnimation = isGrounded ? "Run" : "Jump";
+        if (currentAnimationName == targetAnimation)
+            return;
+
+        pigAnimator.Play(targetAnimation);
+        currentAnimationName = targetAnimation;
     }
 
     void UpdateJump()
