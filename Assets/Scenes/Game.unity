@@ -1274,6 +1274,7 @@ MonoBehaviour:
   pigAnimator: {fileID: 2128811425}
   dashParticleSystem: {fileID: 1735360840}
   waterSplashParticlesPrefab: {fileID: 3246886405276576482, guid: acab50a077dfa8f46a89518a703254f3, type: 3}
+  bushExplodeParticlesPrefab: {fileID: 1498233074592429079, guid: f8701256d80b644478c57f0499c5631a, type: 3}
   fallGravity: 20
   maxFallSpeed: 25
   fallAccelerationMultiplier: 2
@@ -1284,8 +1285,6 @@ MonoBehaviour:
   crashSpinRevolutions: 1.5
   crashRandomZTiltMax: 60
   crashSidewaysDistance: 1.5
-  crashFlashFrequency: 7
-  crashFlashIntensity: 1
   waterDeathSinkDistance: 2
 --- !u!54 &505777437
 Rigidbody:

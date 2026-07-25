@@ -57,6 +57,7 @@ public class Pig : MonoBehaviour
     public Animator pigAnimator;
     public ParticleSystem dashParticleSystem;
     public GameObject waterSplashParticlesPrefab;
+    public GameObject bushExplodeParticlesPrefab;
 
     public float fallGravity = 20f;
     public float maxFallSpeed = 25f;
@@ -295,6 +296,8 @@ public class Pig : MonoBehaviour
 
         if (other.CompareTag("Bush"))
         {
+            SpawnBushExplodeParticles(other.transform.position);
+
             if (dashSpeedTimer > 0f)
             {
                 Destroy(other.gameObject);
@@ -377,6 +380,15 @@ public class Pig : MonoBehaviour
 
         float crashDuration = gameController != null ? Mathf.Max(0f, gameController.gameOverScreenDelay) : 1f;
         StartCoroutine(PlayCrashDeathAnimation(crashDuration));
+    }
+
+    void SpawnBushExplodeParticles(Vector3 spawnPosition)
+    {
+        if (bushExplodeParticlesPrefab == null)
+            return;
+
+        GameObject particles = Instantiate(bushExplodeParticlesPrefab, spawnPosition, Quaternion.identity);
+        Destroy(particles, 1f);
     }
 
     IEnumerator ShrinkOnWaterDeath(float duration)
