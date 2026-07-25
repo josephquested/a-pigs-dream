@@ -66,7 +66,9 @@ public class Pig : MonoBehaviour
     [Header("DEATH")]
     public float crashBackwardDistance = 3f;
     public float crashUpwardDistance = 4f;
+    public float crashEndYOffset = -1f;
     public float crashSpinRevolutions = 2f;
+    public float crashRandomZTiltMax = 20f;
 
     float jumpCooldown;
     float dashCooldown;
@@ -457,11 +459,15 @@ public class Pig : MonoBehaviour
         Vector3 startPosition = transform.position;
         Quaternion startRotation = transform.rotation;
         Vector3 backwardDirection = -transform.forward;
+        float peakHeight = Mathf.Max(0f, crashUpwardDistance);
+        float zTiltDirection = Random.value < 0.5f ? -1f : 1f;
+        float zTiltMagnitude = Random.Range(0f, Mathf.Max(0f, crashRandomZTiltMax));
+        float targetZTilt = zTiltDirection * zTiltMagnitude;
 
         if (duration <= 0f)
         {
-            transform.position = startPosition + backwardDirection * crashBackwardDistance + Vector3.up * crashUpwardDistance;
-            transform.rotation = startRotation * Quaternion.Euler(-360f * crashSpinRevolutions, 0f, 0f);
+            transform.position = startPosition + backwardDirection * crashBackwardDistance + Vector3.up * crashEndYOffset;
+            transform.rotation = startRotation * Quaternion.Euler(-360f * crashSpinRevolutions, 0f, targetZTilt);
             yield break;
         }
 
@@ -471,17 +477,21 @@ public class Pig : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
 
+            // Parabolic hop that peaks mid-flight, plus an end offset for the final downward drop.
+            float yOffset = (4f * peakHeight * t * (1f - t)) + (crashEndYOffset * t);
+
             transform.position = startPosition
                 + backwardDirection * (crashBackwardDistance * t)
-                + Vector3.up * (crashUpwardDistance * t);
+                + Vector3.up * yOffset;
 
             float spinAngle = -360f * crashSpinRevolutions * t;
-            transform.rotation = startRotation * Quaternion.Euler(spinAngle, 0f, 0f);
+            float zTiltAngle = targetZTilt * t;
+            transform.rotation = startRotation * Quaternion.Euler(spinAngle, 0f, zTiltAngle);
 
             yield return null;
         }
 
-        transform.position = startPosition + backwardDirection * crashBackwardDistance + Vector3.up * crashUpwardDistance;
-        transform.rotation = startRotation * Quaternion.Euler(-360f * crashSpinRevolutions, 0f, 0f);
+        transform.position = startPosition + backwardDirection * crashBackwardDistance + Vector3.up * crashEndYOffset;
+        transform.rotation = startRotation * Quaternion.Euler(-360f * crashSpinRevolutions, 0f, targetZTilt);
     }
 }

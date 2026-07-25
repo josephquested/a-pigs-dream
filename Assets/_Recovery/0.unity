@@ -1280,9 +1280,7 @@ MonoBehaviour:
   isGrounded: 1
   crashBackwardDistance: 3
   crashUpwardDistance: 4
-  crashEndYOffset: -1
-  crashSpinRevolutions: 1.5
-  crashRandomZTiltMax: 60
+  crashSpinRevolutions: 2
 --- !u!54 &505777437
 Rigidbody:
   m_ObjectHideFlags: 0
