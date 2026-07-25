@@ -301,6 +301,7 @@ public class Pig : MonoBehaviour
             if (dashSpeedTimer > 0f)
             {
                 Destroy(other.gameObject);
+                gameController.AddScorePoints(1);
 
                 if (AudioController.Instance != null)
                 {
