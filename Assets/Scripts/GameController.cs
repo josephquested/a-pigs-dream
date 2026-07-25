@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections.Generic;
+using System.Collections;
 using LootLocker.Requests;
 
 public class GameController : MonoBehaviour
@@ -33,8 +34,10 @@ public class GameController : MonoBehaviour
     public TextMeshProUGUI yourScoreText;
     public List<TextMeshProUGUI> highscoreUIs = new List<TextMeshProUGUI>();
     public float gameTime = 60f;
+    public float gameOverScreenDelay = 1f;
 
     bool isGameOver = false;
+    bool isGameOverScreenVisible = false;
     float timeRemaining;
     float timerTickCounter;
     float scoreTickCounter;
@@ -46,6 +49,21 @@ public class GameController : MonoBehaviour
             return;
 
         isGameOver = true;
+
+        StartCoroutine(HandleGameOverSequence());
+    }
+
+    IEnumerator HandleGameOverSequence()
+    {
+        float safeDelay = Mathf.Max(0f, gameOverScreenDelay);
+        if (safeDelay > 0f)
+        {
+            yield return new WaitForSeconds(safeDelay);
+        }
+
+        gameOverScreen.SetActive(true);
+        isGameOverScreenVisible = true;
+        Debug.Log("Game Over!");
 
         if (LootManager.Instance != null)
         {
@@ -63,9 +81,6 @@ public class GameController : MonoBehaviour
         {
             Debug.LogWarning("LootManager instance was not found; cannot submit score before loading leaderboard.");
         }
-
-        gameOverScreen.SetActive(true);
-        Debug.Log("Game Over!");
     }
 
     public void AddTime(float timeToAdd)
@@ -134,7 +149,7 @@ public class GameController : MonoBehaviour
 
     void CheckForRestart()
     {
-        if (isGameOver && Input.GetKeyDown(KeyCode.Return))
+        if (isGameOverScreenVisible && Input.GetKeyDown(KeyCode.Return))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }

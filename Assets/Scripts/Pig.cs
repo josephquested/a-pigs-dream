@@ -1,7 +1,12 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public class Pig : MonoBehaviour
 {
+    static readonly int ColorPropertyId = Shader.PropertyToID("_Color");
+    static readonly int BaseColorPropertyId = Shader.PropertyToID("_BaseColor");
+
     // -- SYSTEM -- //
 
     GameController gameController;
@@ -51,6 +56,7 @@ public class Pig : MonoBehaviour
     public Transform pigModelTransform;
     public Animator pigAnimator;
     public ParticleSystem dashParticleSystem;
+    public GameObject waterSplashParticlesPrefab;
 
     public float fallGravity = 20f;
     public float maxFallSpeed = 25f;
@@ -307,6 +313,15 @@ public class Pig : MonoBehaviour
         if (other.CompareTag("Water"))
         {
             isAlive = false;
+
+            if (waterSplashParticlesPrefab != null)
+            {
+                Instantiate(waterSplashParticlesPrefab, transform.position, Quaternion.identity);
+            }
+
+            float shrinkDuration = gameController != null ? Mathf.Max(0f, gameController.gameOverScreenDelay) : 1f;
+            StartCoroutine(ShrinkOnWaterDeath(shrinkDuration));
+
             gameController.GameOver();
             Debug.Log("Pig fell into water!");
 
@@ -340,6 +355,83 @@ public class Pig : MonoBehaviour
             {
                 AudioController.Instance.PlayApplePickup();
             }
+        }
+    }
+
+    IEnumerator ShrinkOnWaterDeath(float duration)
+    {
+        Vector3 startScale = transform.localScale;
+        Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+        List<Material> fadeMaterials = new List<Material>();
+        List<int> fadeColorPropertyIds = new List<int>();
+        List<Color> startColors = new List<Color>();
+
+        foreach (Renderer renderer in renderers)
+        {
+            Material[] materials = renderer.materials;
+            foreach (Material material in materials)
+            {
+                if (material == null)
+                    continue;
+
+                int colorPropertyId;
+                if (material.HasProperty(ColorPropertyId))
+                {
+                    colorPropertyId = ColorPropertyId;
+                }
+                else if (material.HasProperty(BaseColorPropertyId))
+                {
+                    colorPropertyId = BaseColorPropertyId;
+                }
+                else
+                {
+                    continue;
+                }
+
+                fadeMaterials.Add(material);
+                fadeColorPropertyIds.Add(colorPropertyId);
+                startColors.Add(material.GetColor(colorPropertyId));
+            }
+        }
+
+        if (duration <= 0f)
+        {
+            transform.localScale = Vector3.zero;
+
+            for (int i = 0; i < fadeMaterials.Count; i++)
+            {
+                Color color = startColors[i];
+                color.a = 0f;
+                fadeMaterials[i].SetColor(fadeColorPropertyIds[i], color);
+            }
+
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            transform.localScale = Vector3.Lerp(startScale, Vector3.zero, t);
+
+            for (int i = 0; i < fadeMaterials.Count; i++)
+            {
+                Color color = startColors[i];
+                color.a = Mathf.Lerp(startColors[i].a, 0f, t);
+                fadeMaterials[i].SetColor(fadeColorPropertyIds[i], color);
+            }
+
+            yield return null;
+        }
+
+        transform.localScale = Vector3.zero;
+
+        for (int i = 0; i < fadeMaterials.Count; i++)
+        {
+            Color color = startColors[i];
+            color.a = 0f;
+            fadeMaterials[i].SetColor(fadeColorPropertyIds[i], color);
         }
     }
 }

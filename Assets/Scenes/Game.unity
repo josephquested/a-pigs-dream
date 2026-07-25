@@ -554,6 +554,7 @@ MonoBehaviour:
   - {fileID: 833158478}
   - {fileID: 1538017055}
   gameTime: 30
+  gameOverScreenDelay: 1
 --- !u!4 &238776684
 Transform:
   m_ObjectHideFlags: 0
@@ -1272,6 +1273,7 @@ MonoBehaviour:
   pigModelTransform: {fileID: 2128811424}
   pigAnimator: {fileID: 2128811425}
   dashParticleSystem: {fileID: 1735360840}
+  waterSplashParticlesPrefab: {fileID: 3246886405276576482, guid: acab50a077dfa8f46a89518a703254f3, type: 3}
   fallGravity: 20
   maxFallSpeed: 25
   fallAccelerationMultiplier: 2
@@ -4528,7 +4530,7 @@ ParticleSystem:
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
-        key1: {r: 1, g: 1, b: 1, a: 0.35686275}
+        key1: {r: 1, g: 1, b: 1, a: 0}
         key2: {r: 0, g: 0, b: 0, a: 0}
         key3: {r: 0, g: 0, b: 0, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
