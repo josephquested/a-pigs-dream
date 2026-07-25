@@ -85,6 +85,7 @@ MonoBehaviour:
   maxObjectsToSpawn: 0
   randomizeYRotation: 1
   spawnYOffset: 0
+  isWaterChunk: 1
 --- !u!1 &4732798444648618886
 GameObject:
   m_ObjectHideFlags: 0

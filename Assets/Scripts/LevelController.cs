@@ -37,6 +37,7 @@ public class LevelController : MonoBehaviour
 
     public int chunksAhead = 10;
     public GameObject blankLevelChunkPrefab;
+    public GameObject waterChunkPrefab;
     public float appleSpawnChance = 50f;
     public GameObject applePrefab;
     public GameObject edgeChunkPrefab;
@@ -81,19 +82,29 @@ public class LevelController : MonoBehaviour
         
         GameObject chunk = Instantiate(chunkToSpawn, new Vector3(0, 0, nextChunkZ), Quaternion.identity);
         spawnedChunks.Add(chunk);
+
+        LevelChunk levelChunk = chunk.GetComponent<LevelChunk>();
+        bool isWaterChunk = levelChunk != null && levelChunk.isWaterChunk;
         
-        // Spawn edge chunks on left and right
-        if (edgeChunkPrefab != null)
+        // Spawn side chunks on left and right.
+        // Water chunks: 30% water edges, 70% normal edges.
+        bool useWaterEdges = isWaterChunk && Random.value < 0.3f;
+        GameObject sideChunkPrefab = useWaterEdges ? waterChunkPrefab : edgeChunkPrefab;
+        if (sideChunkPrefab == null)
         {
-            GameObject leftEdge = Instantiate(edgeChunkPrefab, new Vector3(-10f, 0, nextChunkZ), Quaternion.identity);
-            GameObject rightEdge = Instantiate(edgeChunkPrefab, new Vector3(10f, 0, nextChunkZ), Quaternion.Euler(0, 180f, 0));
+            sideChunkPrefab = useWaterEdges ? edgeChunkPrefab : waterChunkPrefab;
+        }
+
+        if (sideChunkPrefab != null)
+        {
+            GameObject leftEdge = Instantiate(sideChunkPrefab, new Vector3(-10f, 0, nextChunkZ), Quaternion.identity);
+            GameObject rightEdge = Instantiate(sideChunkPrefab, new Vector3(10f, 0, nextChunkZ), Quaternion.Euler(0, 180f, 0));
             spawnedChunks.Add(leftEdge);
             spawnedChunks.Add(rightEdge);
         }
         
         // Determine if apple should spawn based on chance
         bool shouldSpawnApple = Random.Range(0f, 100f) < appleSpawnChance;
-        LevelChunk levelChunk = chunk.GetComponent<LevelChunk>();
         if (levelChunk != null && shouldSpawnApple)
         {
             levelChunk.SpawnApple(applePrefab);

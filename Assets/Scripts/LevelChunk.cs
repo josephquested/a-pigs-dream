@@ -18,6 +18,7 @@ public class LevelChunk : MonoBehaviour
     public int maxObjectsToSpawn = 2;
     public bool randomizeYRotation = true;
     public float spawnYOffset = 0f;
+    public bool isWaterChunk = false;
 
     public void SpawnObjects()
     {
