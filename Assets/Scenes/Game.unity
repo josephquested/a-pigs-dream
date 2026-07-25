@@ -1283,6 +1283,10 @@ MonoBehaviour:
   crashEndYOffset: -1
   crashSpinRevolutions: 1.5
   crashRandomZTiltMax: 60
+  crashSidewaysDistance: 1.5
+  crashFlashFrequency: 7
+  crashFlashIntensity: 1
+  waterDeathSinkDistance: 2
 --- !u!54 &505777437
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -69,6 +69,8 @@ public class Pig : MonoBehaviour
     public float crashEndYOffset = -1f;
     public float crashSpinRevolutions = 2f;
     public float crashRandomZTiltMax = 20f;
+    public float crashSidewaysDistance = 1.5f;
+    public float waterDeathSinkDistance = 2f;
 
     float jumpCooldown;
     float dashCooldown;
@@ -380,6 +382,7 @@ public class Pig : MonoBehaviour
     IEnumerator ShrinkOnWaterDeath(float duration)
     {
         Vector3 startScale = transform.localScale;
+        Vector3 startPosition = transform.position;
         Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
         List<Material> fadeMaterials = new List<Material>();
         List<int> fadeColorPropertyIds = new List<int>();
@@ -416,6 +419,7 @@ public class Pig : MonoBehaviour
         if (duration <= 0f)
         {
             transform.localScale = Vector3.zero;
+            transform.position = startPosition + Vector3.down * waterDeathSinkDistance;
 
             for (int i = 0; i < fadeMaterials.Count; i++)
             {
@@ -433,6 +437,7 @@ public class Pig : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
             transform.localScale = Vector3.Lerp(startScale, Vector3.zero, t);
+            transform.position = Vector3.Lerp(startPosition, startPosition + Vector3.down * waterDeathSinkDistance, t);
 
             for (int i = 0; i < fadeMaterials.Count; i++)
             {
@@ -445,6 +450,7 @@ public class Pig : MonoBehaviour
         }
 
         transform.localScale = Vector3.zero;
+    transform.position = startPosition + Vector3.down * waterDeathSinkDistance;
 
         for (int i = 0; i < fadeMaterials.Count; i++)
         {
@@ -459,6 +465,7 @@ public class Pig : MonoBehaviour
         Vector3 startPosition = transform.position;
         Quaternion startRotation = transform.rotation;
         Vector3 backwardDirection = -transform.forward;
+        Vector3 sidewaysDirection = transform.right;
         float peakHeight = Mathf.Max(0f, crashUpwardDistance);
         float zTiltDirection = Random.value < 0.5f ? -1f : 1f;
         float zTiltMagnitude = Random.Range(0f, Mathf.Max(0f, crashRandomZTiltMax));
@@ -466,7 +473,10 @@ public class Pig : MonoBehaviour
 
         if (duration <= 0f)
         {
-            transform.position = startPosition + backwardDirection * crashBackwardDistance + Vector3.up * crashEndYOffset;
+            transform.position = startPosition
+                + backwardDirection * crashBackwardDistance
+                + sidewaysDirection * (crashSidewaysDistance * zTiltDirection)
+                + Vector3.up * crashEndYOffset;
             transform.rotation = startRotation * Quaternion.Euler(-360f * crashSpinRevolutions, 0f, targetZTilt);
             yield break;
         }
@@ -482,6 +492,7 @@ public class Pig : MonoBehaviour
 
             transform.position = startPosition
                 + backwardDirection * (crashBackwardDistance * t)
+                + sidewaysDirection * (crashSidewaysDistance * zTiltDirection * t)
                 + Vector3.up * yOffset;
 
             float spinAngle = -360f * crashSpinRevolutions * t;
@@ -491,7 +502,10 @@ public class Pig : MonoBehaviour
             yield return null;
         }
 
-        transform.position = startPosition + backwardDirection * crashBackwardDistance + Vector3.up * crashEndYOffset;
+        transform.position = startPosition
+            + backwardDirection * crashBackwardDistance
+            + sidewaysDirection * (crashSidewaysDistance * zTiltDirection)
+            + Vector3.up * crashEndYOffset;
         transform.rotation = startRotation * Quaternion.Euler(-360f * crashSpinRevolutions, 0f, targetZTilt);
     }
 }
