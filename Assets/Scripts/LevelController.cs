@@ -40,6 +40,12 @@ public class LevelController : MonoBehaviour
     public float appleSpawnChance = 50f;
     public GameObject applePrefab;
     public GameObject edgeChunkPrefab;
+
+    public GameObject rightTurningChunkPrefab;
+    [Range(0f, 100f)] public float rightTurnChunkChance = 20f;
+    public int minChunksBetweenRightTurns = 8;
+    public int blankChunksAfterRightTurn = 1;
+
     public int guaranteedInitialBlankChunks = 8;
     public float chunksBehindToKeep = 2f;
     [Range(0f, 1f)] public float startingBlankChunkChance = 0.9f;
@@ -49,6 +55,10 @@ public class LevelController : MonoBehaviour
     GameObject[] levelChunkPrefabs;
     int chunksSpawned = 0;
     GameObject lastSpawnedMainChunkPrefab;
+    int chunksSpawnedAtLastRightTurn = int.MinValue / 2;
+    bool pendingRightTurnAfterBlank = false;
+    int forcedBlankChunksAfterTurnRemaining = 0;
+    float currentLaneCenterX = 0f;
 
     List<GameObject> spawnedChunks = new List<GameObject>();
     float nextChunkZ = 0f;
@@ -78,8 +88,10 @@ public class LevelController : MonoBehaviour
     void SpawnChunk()
     {
         GameObject chunkToSpawn = SelectChunkPrefab();
+        bool isRightTurnChunk = rightTurningChunkPrefab != null && chunkToSpawn == rightTurningChunkPrefab;
+        float spawnX = currentLaneCenterX;
         
-        GameObject chunk = Instantiate(chunkToSpawn, new Vector3(0, 0, nextChunkZ), Quaternion.identity);
+        GameObject chunk = Instantiate(chunkToSpawn, new Vector3(spawnX, 0, nextChunkZ), Quaternion.identity);
         spawnedChunks.Add(chunk);
 
         if (fireflyParticles != null)
@@ -103,10 +115,37 @@ public class LevelController : MonoBehaviour
 
         if (sideChunkPrefab != null)
         {
-            GameObject leftEdge = Instantiate(sideChunkPrefab, new Vector3(-10f, 0, nextChunkZ), Quaternion.identity);
-            GameObject rightEdge = Instantiate(sideChunkPrefab, new Vector3(10f, 0, nextChunkZ), Quaternion.Euler(0, 180f, 0));
+            float leftEdgeX = spawnX - chunkSize;
+            float rightEdgeX = isRightTurnChunk ? spawnX + (2f * chunkSize) : spawnX + chunkSize;
+
+            GameObject leftEdge = Instantiate(sideChunkPrefab, new Vector3(leftEdgeX, 0, nextChunkZ), Quaternion.identity);
+            GameObject rightEdge = Instantiate(sideChunkPrefab, new Vector3(rightEdgeX, 0, nextChunkZ), Quaternion.Euler(0, 180f, 0));
             spawnedChunks.Add(leftEdge);
             spawnedChunks.Add(rightEdge);
+        }
+
+        // Transition into the right lane by placing a blank connector chunk at +X on the same Z.
+        if (isRightTurnChunk)
+        {
+            chunksSpawnedAtLastRightTurn = chunksSpawned;
+            pendingRightTurnAfterBlank = false;
+            forcedBlankChunksAfterTurnRemaining = Mathf.Max(0, blankChunksAfterRightTurn);
+
+            if (blankLevelChunkPrefab != null)
+            {
+                GameObject transitionBlank = Instantiate(
+                    blankLevelChunkPrefab,
+                    new Vector3(spawnX + chunkSize, 0, nextChunkZ),
+                    Quaternion.identity
+                );
+                spawnedChunks.Add(transitionBlank);
+            }
+            else
+            {
+                Debug.LogWarning("Right turn spawned but blankLevelChunkPrefab is missing, so no transition blank was placed.");
+            }
+
+            currentLaneCenterX += chunkSize;
         }
         
         // Determine if apple should spawn based on chance
@@ -126,6 +165,45 @@ public class LevelController : MonoBehaviour
         if (blankLevelChunkPrefab != null && chunksSpawned < Mathf.Max(0, guaranteedInitialBlankChunks))
         {
             return blankLevelChunkPrefab;
+        }
+
+        if (forcedBlankChunksAfterTurnRemaining > 0)
+        {
+            if (blankLevelChunkPrefab != null)
+            {
+                forcedBlankChunksAfterTurnRemaining--;
+                return blankLevelChunkPrefab;
+            }
+
+            forcedBlankChunksAfterTurnRemaining = 0;
+        }
+
+        int safeMinChunksBetweenRightTurns = Mathf.Max(0, minChunksBetweenRightTurns);
+        bool rightTurnOffCooldown = (chunksSpawned - chunksSpawnedAtLastRightTurn) > safeMinChunksBetweenRightTurns;
+
+        if (pendingRightTurnAfterBlank && rightTurningChunkPrefab != null && rightTurnOffCooldown)
+        {
+            return rightTurningChunkPrefab;
+        }
+
+        if (pendingRightTurnAfterBlank && !rightTurnOffCooldown)
+        {
+            pendingRightTurnAfterBlank = false;
+        }
+
+        bool canSpawnRightTurn = rightTurningChunkPrefab != null
+            && rightTurnOffCooldown
+            && Random.Range(0f, 100f) < rightTurnChunkChance;
+        if (canSpawnRightTurn)
+        {
+            bool previousChunkWasBlank = lastSpawnedMainChunkPrefab == blankLevelChunkPrefab;
+            if (!previousChunkWasBlank && blankLevelChunkPrefab != null)
+            {
+                pendingRightTurnAfterBlank = true;
+                return blankLevelChunkPrefab;
+            }
+
+            return rightTurningChunkPrefab;
         }
 
         float currentBlankChance = GetCurrentBlankChance();
