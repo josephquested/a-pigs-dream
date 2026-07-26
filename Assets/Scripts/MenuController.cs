@@ -23,11 +23,6 @@ public class MenuController : MonoBehaviour
     void Update()
     {
         bool enterPressed = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
-        if (enterPressed)
-        {
-            PlayIfAssigned(confirmAudioSource);
-        }
-
         if (nameEntryFlowStarted && Input.anyKeyDown && !enterPressed)
         {
             PlayTypingSound();
@@ -36,11 +31,15 @@ public class MenuController : MonoBehaviour
         if (enterPressed)
         {
             if (!nameEntryFlowStarted)
+            {
+                OpenNameEntry();
                 return;
+            }
 
             if (isSubmittingPlayerName)
                 return;
 
+            PlayIfAssigned(confirmAudioSource);
             SubmitPlayerNameAndStartGame();
         }
     }

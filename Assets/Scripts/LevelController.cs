@@ -85,7 +85,10 @@ public class LevelController : MonoBehaviour
     public GameObject blankLevelChunkPrefab;
     public GameObject waterChunkPrefab;
     public GameObject fireflyParticles;
-    public float appleSpawnChance = 50f;
+    [Header("Apple Spawning")]
+    [Range(0f, 100f)] public float earlyAppleSpawnChance = 10f;
+    [Range(0f, 100f)] public float lateAppleSpawnChance = 50f;
+    [Min(0.1f)] public float appleSpawnRampExponent = 1f;
     public GameObject applePrefab;
     public GameObject[] decorationObjects;
     public int minDecorationsToSpawn = 0;
@@ -221,8 +224,8 @@ public class LevelController : MonoBehaviour
             currentLaneCenterX += chunkSize * turnDirection;
         }
         
-        // Determine if apple should spawn based on chance
-        bool shouldSpawnApple = Random.Range(0f, 100f) < appleSpawnChance;
+        // Determine if apple should spawn based on reverse blank-chunk difficulty progression.
+        bool shouldSpawnApple = Random.Range(0f, 100f) < GetCurrentAppleSpawnChance();
         if (levelChunk != null && shouldSpawnApple)
         {
             levelChunk.SpawnApple(applePrefab);
@@ -451,5 +454,27 @@ public class LevelController : MonoBehaviour
 
         float progression = Mathf.Clamp01(chunksSpawned * Mathf.Max(0f, difficultyRampSpeed));
         return Mathf.Lerp(safeStartBlankChance, safeMinBlankChance, progression);
+    }
+
+    float GetCurrentAppleSpawnChance()
+    {
+        float safeEarlyChance = Mathf.Clamp(earlyAppleSpawnChance, 0f, 100f);
+        float safeLateChance = Mathf.Clamp(lateAppleSpawnChance, 0f, 100f);
+
+        float safeMinBlankChance = Mathf.Clamp01(minimumBlankChunkChance);
+        float safeStartBlankChance = Mathf.Clamp01(startingBlankChunkChance);
+        if (safeStartBlankChance < safeMinBlankChance)
+        {
+            safeStartBlankChance = safeMinBlankChance;
+        }
+
+        float currentBlankChance = GetCurrentBlankChance();
+        float blankChanceRange = safeStartBlankChance - safeMinBlankChance;
+        float reverseProgress = blankChanceRange <= Mathf.Epsilon
+            ? Mathf.Clamp01(chunksSpawned * Mathf.Max(0f, difficultyRampSpeed))
+            : Mathf.Clamp01((safeStartBlankChance - currentBlankChance) / blankChanceRange);
+
+        float shapedProgress = Mathf.Pow(reverseProgress, Mathf.Max(0.1f, appleSpawnRampExponent));
+        return Mathf.Lerp(safeEarlyChance, safeLateChance, shapedProgress);
     }
 }
