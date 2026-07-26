@@ -16,6 +16,12 @@ public class GameController : MonoBehaviour
     {
         cameraController = GameObject.FindFirstObjectByType<CameraController>();
         levelController = GameObject.FindFirstObjectByType<LevelController>();
+
+        if (AudioController.Instance != null)
+        {
+            AudioController.Instance.PlayBGM();
+        }
+
         timeRemaining = gameTime;
         score = 0;
         UpdateTimerDisplay();
@@ -54,6 +60,11 @@ public class GameController : MonoBehaviour
             return;
 
         isGameOver = true;
+
+        if (AudioController.Instance != null)
+        {
+            AudioController.Instance.FadeOutBGM(Mathf.Max(0f, gameOverScreenDelay));
+        }
 
         StartCoroutine(HandleGameOverSequence());
     }

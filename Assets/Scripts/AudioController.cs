@@ -6,6 +6,7 @@ public class AudioController : MonoBehaviour
     public static AudioController Instance { get; private set; }
 
     [Header("Gameplay SFX")]
+    public AudioSource bgmAudioSource;
     public AudioSource jumpAudioSource;
     public AudioClip[] jumpClips;
 
@@ -23,6 +24,8 @@ public class AudioController : MonoBehaviour
 
     float runningTargetVolume = 1f;
     bool runningLoopWantsToPlay;
+    float bgmTargetVolume = 1f;
+    Coroutine bgmFadeCoroutine;
 
     void Awake()
     {
@@ -39,6 +42,12 @@ public class AudioController : MonoBehaviour
         {
             runningTargetVolume = Mathf.Clamp01(runningAudioSource.volume);
         }
+
+        if (bgmAudioSource != null)
+        {
+            bgmTargetVolume = Mathf.Clamp01(bgmAudioSource.volume);
+            PlayBGM();
+        }
     }
 
     void Update()
@@ -49,6 +58,52 @@ public class AudioController : MonoBehaviour
     public void PlayJump()
     {
         PlayRandomClipOrSource(jumpAudioSource, jumpClips);
+    }
+
+    public void PlayBGM()
+    {
+        if (bgmAudioSource == null)
+            return;
+
+        if (bgmFadeCoroutine != null)
+        {
+            StopCoroutine(bgmFadeCoroutine);
+            bgmFadeCoroutine = null;
+        }
+
+        bgmAudioSource.loop = true;
+        bgmAudioSource.volume = bgmTargetVolume;
+        if (!bgmAudioSource.isPlaying)
+        {
+            bgmAudioSource.Play();
+        }
+    }
+
+    public void FadeOutBGM(float duration)
+    {
+        if (bgmAudioSource == null)
+            return;
+
+        if (bgmFadeCoroutine != null)
+        {
+            StopCoroutine(bgmFadeCoroutine);
+            bgmFadeCoroutine = null;
+        }
+
+        if (!bgmAudioSource.isPlaying)
+        {
+            bgmAudioSource.volume = bgmTargetVolume;
+            return;
+        }
+
+        if (duration <= 0f)
+        {
+            bgmAudioSource.Stop();
+            bgmAudioSource.volume = bgmTargetVolume;
+            return;
+        }
+
+        bgmFadeCoroutine = StartCoroutine(FadeOutBGMRoutine(duration));
     }
 
     public void PlayDash()
@@ -160,5 +215,23 @@ public class AudioController : MonoBehaviour
             runningAudioSource.Stop();
             runningAudioSource.volume = runningTargetVolume;
         }
+    }
+
+    System.Collections.IEnumerator FadeOutBGMRoutine(float duration)
+    {
+        float elapsed = 0f;
+        float startVolume = bgmAudioSource.volume;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            bgmAudioSource.volume = Mathf.Lerp(startVolume, 0f, t);
+            yield return null;
+        }
+
+        bgmAudioSource.Stop();
+        bgmAudioSource.volume = bgmTargetVolume;
+        bgmFadeCoroutine = null;
     }
 }
