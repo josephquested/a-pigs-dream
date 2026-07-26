@@ -34,6 +34,7 @@ public class Pig : MonoBehaviour
         UpdateDash();
         UpdateJumpHeight();
         UpdateFalling();
+        UpdateRunningAudio();
         UpdateCooldowns();
     }
 
@@ -287,6 +288,22 @@ public class Pig : MonoBehaviour
         }
     }
 
+    void UpdateRunningAudio()
+    {
+        if (AudioController.Instance == null)
+            return;
+
+        bool shouldPlayRunningLoop = isAlive && isGrounded && !isJumping;
+        if (shouldPlayRunningLoop)
+        {
+            AudioController.Instance.StartRunningLoop();
+        }
+        else
+        {
+            AudioController.Instance.StopRunningLoop();
+        }
+    }
+
     // -- COLLISIONS -- //
 
     void OnTriggerEnter(Collider other)
@@ -319,6 +336,11 @@ public class Pig : MonoBehaviour
         if (other.CompareTag("Water"))
         {
             isAlive = false;
+
+            if (AudioController.Instance != null)
+            {
+                AudioController.Instance.StopRunningLoop();
+            }
 
             if (waterSplashParticlesPrefab != null)
             {
@@ -366,6 +388,11 @@ public class Pig : MonoBehaviour
             return;
 
         isAlive = false;
+
+        if (AudioController.Instance != null)
+        {
+            AudioController.Instance.StopRunningLoop();
+        }
 
         if (gameController != null)
         {
@@ -520,5 +547,13 @@ public class Pig : MonoBehaviour
             + sidewaysDirection * (crashSidewaysDistance * zTiltDirection)
             + Vector3.up * crashEndYOffset;
         transform.rotation = startRotation * Quaternion.Euler(-360f * crashSpinRevolutions, 0f, targetZTilt);
+    }
+
+    void OnDisable()
+    {
+        if (AudioController.Instance != null)
+        {
+            AudioController.Instance.StopRunningLoop();
+        }
     }
 }

@@ -7,11 +7,22 @@ public class AudioController : MonoBehaviour
 
     [Header("Gameplay SFX")]
     public AudioSource jumpAudioSource;
+    public AudioClip[] jumpClips;
+
+    [Header("Running Loop")]
+    public AudioSource runningAudioSource;
+    public float runningFadeInDuration = 0.12f;
+    public float runningFadeOutDuration = 0.12f;
+
     public AudioSource dashAudioSource;
     public AudioSource waterDeathAudioSource;
     public AudioSource crashIntoSomethingDeathAudioSource;
+    public AudioClip[] crashDeathClips;
     public AudioSource applePickupAudioSource;
     public AudioSource bushBreakAudioSource;
+
+    float runningTargetVolume = 1f;
+    bool runningLoopWantsToPlay;
 
     void Awake()
     {
@@ -23,16 +34,58 @@ public class AudioController : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        if (runningAudioSource != null)
+        {
+            runningTargetVolume = Mathf.Clamp01(runningAudioSource.volume);
+        }
+    }
+
+    void Update()
+    {
+        UpdateRunningLoopFade();
     }
 
     public void PlayJump()
     {
-        PlayIfAssigned(jumpAudioSource);
+        PlayRandomClipOrSource(jumpAudioSource, jumpClips);
     }
 
     public void PlayDash()
     {
         PlayIfAssigned(dashAudioSource);
+    }
+
+    public void StartRunningLoop()
+    {
+        if (runningAudioSource == null)
+        {
+            return;
+        }
+
+        runningLoopWantsToPlay = true;
+        runningAudioSource.loop = true;
+        if (!runningAudioSource.isPlaying)
+        {
+            runningAudioSource.volume = 0f;
+            runningAudioSource.Play();
+        }
+    }
+
+    public void StopRunningLoop()
+    {
+        if (runningAudioSource == null)
+        {
+            return;
+        }
+
+        runningLoopWantsToPlay = false;
+
+        if (!runningAudioSource.isPlaying)
+        {
+            runningAudioSource.Stop();
+            runningAudioSource.volume = runningTargetVolume;
+        }
     }
 
     public void PlayWaterDeath()
@@ -42,7 +95,7 @@ public class AudioController : MonoBehaviour
 
     public void PlayCrashDeath()
     {
-        PlayIfAssigned(crashIntoSomethingDeathAudioSource);
+        PlayRandomClipOrSource(crashIntoSomethingDeathAudioSource, crashDeathClips);
     }
 
     public void PlayApplePickup()
@@ -60,6 +113,52 @@ public class AudioController : MonoBehaviour
         if (source != null)
         {
             source.Play();
+        }
+    }
+
+    void PlayRandomClipOrSource(AudioSource source, AudioClip[] clips)
+    {
+        if (source == null)
+        {
+            return;
+        }
+
+        if (clips != null && clips.Length > 0)
+        {
+            int index = Random.Range(0, clips.Length);
+            AudioClip clip = clips[index];
+            if (clip != null)
+            {
+                source.PlayOneShot(clip);
+                return;
+            }
+        }
+
+        source.Play();
+    }
+
+    void UpdateRunningLoopFade()
+    {
+        if (runningAudioSource == null || !runningAudioSource.isPlaying)
+            return;
+
+        float target = runningLoopWantsToPlay ? runningTargetVolume : 0f;
+        float duration = runningLoopWantsToPlay ? runningFadeInDuration : runningFadeOutDuration;
+
+        if (duration <= 0f)
+        {
+            runningAudioSource.volume = target;
+        }
+        else
+        {
+            float step = (runningTargetVolume / duration) * Time.deltaTime;
+            runningAudioSource.volume = Mathf.MoveTowards(runningAudioSource.volume, target, step);
+        }
+
+        if (!runningLoopWantsToPlay && Mathf.Approximately(runningAudioSource.volume, 0f))
+        {
+            runningAudioSource.Stop();
+            runningAudioSource.volume = runningTargetVolume;
         }
     }
 }
