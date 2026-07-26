@@ -36,6 +36,16 @@ public class LevelController : MonoBehaviour
             Debug.LogError("No level chunks found in Assets/Resources/LevelChunks/");
             return;
         }
+
+        GameObject[] loadedDecorations = Resources.LoadAll<GameObject>("Decorations");
+        if (loadedDecorations.Length > 0)
+        {
+            decorationObjects = loadedDecorations;
+        }
+        else if (decorationObjects == null || decorationObjects.Length == 0)
+        {
+            Debug.LogWarning("No decorations found in Assets/Resources/Decorations/ and decorationObjects is empty.");
+        }
         
         // Spawn initial chunks
         for (int i = 0; i < chunksAhead; i++)
@@ -77,6 +87,9 @@ public class LevelController : MonoBehaviour
     public GameObject fireflyParticles;
     public float appleSpawnChance = 50f;
     public GameObject applePrefab;
+    public GameObject[] decorationObjects;
+    public int minDecorationsToSpawn = 0;
+    public int maxDecorationsToSpawn = 2;
     public GameObject edgeChunkPrefab;
 
     public GameObject rightTurningChunkPrefab;
@@ -146,6 +159,11 @@ public class LevelController : MonoBehaviour
 
         LevelChunk levelChunk = chunk.GetComponent<LevelChunk>();
         bool isWaterChunk = levelChunk != null && levelChunk.isWaterChunk;
+
+        if (!isWaterChunk)
+        {
+            SpawnDecorations(levelChunk, chunk.transform);
+        }
         
         // Spawn side chunks on left and right.
         // Water chunks: 30% water edges, 70% normal edges.
@@ -213,6 +231,36 @@ public class LevelController : MonoBehaviour
         nextChunkZ += chunkSize;
         chunksSpawned++;
         lastSpawnedMainChunkPrefab = chunkToSpawn;
+    }
+
+    void SpawnDecorations(LevelChunk levelChunk, Transform parentChunk)
+    {
+        if (decorationObjects == null || decorationObjects.Length == 0)
+            return;
+
+        if (levelChunk == null || levelChunk.topLeftSpawnPoint == null || levelChunk.bottomRightSpawnPoint == null)
+            return;
+
+        int minSpawn = Mathf.Max(0, minDecorationsToSpawn);
+        int maxSpawn = Mathf.Max(minSpawn, maxDecorationsToSpawn);
+        int decorationCount = Random.Range(minSpawn, maxSpawn + 1);
+
+        float minX = Mathf.Min(levelChunk.topLeftSpawnPoint.position.x, levelChunk.bottomRightSpawnPoint.position.x);
+        float maxX = Mathf.Max(levelChunk.topLeftSpawnPoint.position.x, levelChunk.bottomRightSpawnPoint.position.x);
+        float minZ = Mathf.Min(levelChunk.topLeftSpawnPoint.position.z, levelChunk.bottomRightSpawnPoint.position.z);
+        float maxZ = Mathf.Max(levelChunk.topLeftSpawnPoint.position.z, levelChunk.bottomRightSpawnPoint.position.z);
+
+        for (int i = 0; i < decorationCount; i++)
+        {
+            GameObject decorationToSpawn = decorationObjects[Random.Range(0, decorationObjects.Length)];
+            if (decorationToSpawn == null)
+                continue;
+
+            float randomX = Random.Range(minX, maxX);
+            float randomZ = Random.Range(minZ, maxZ);
+            Vector3 spawnPosition = new Vector3(randomX, 0f, randomZ);
+            Instantiate(decorationToSpawn, spawnPosition, decorationToSpawn.transform.rotation, parentChunk);
+        }
     }
 
     GameObject SelectChunkPrefab()
