@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections.Generic;
 using System.Collections;
+using System.Text;
 using LootLocker.Requests;
 
 public class GameController : MonoBehaviour
@@ -49,8 +50,12 @@ public class GameController : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI yourScoreText;
     public TextMeshProUGUI tutorialText;
-    [TextArea(2, 6)] public string firstPlayTutorialMessage = "CONTROLS:\nZ = JUMP\nX = DASH\nARROWS/A-D = MOVE\nCOLLECT APPLES TO SURVIVE";
+    [TextArea(2, 6)] public string firstPlayTutorialMessage;
     public float tutorialTextDisplayDuration = 8f;
+    public float tutorialLineFadeInDuration = 0.35f;
+    public float tutorialFirstLineFadeInMultiplier = 2f;
+    public float tutorialLineStaggerDelay = 0.1f;
+    public float tutorialFadeOutDuration = 0.4f;
     public List<TextMeshProUGUI> highscoreUIs = new List<TextMeshProUGUI>();
     public float gameTime = 60f;
     public float gameOverScreenDelay = 1f;
@@ -71,6 +76,7 @@ public class GameController : MonoBehaviour
     float timerTickCounter;
     float scoreTickCounter;
     int score;
+    Coroutine tutorialTextRoutine;
 
     public void GameOver()
     {
@@ -274,23 +280,119 @@ public class GameController : MonoBehaviour
         if (!shouldShowTutorial || tutorialText == null)
             return;
 
-        tutorialText.text = firstPlayTutorialMessage;
-        tutorialText.gameObject.SetActive(true);
-
-        if (tutorialTextDisplayDuration > 0f)
+        if (tutorialTextRoutine != null)
         {
-            StartCoroutine(HideTutorialTextAfterDelay(tutorialTextDisplayDuration));
+            StopCoroutine(tutorialTextRoutine);
         }
+
+        tutorialTextRoutine = StartCoroutine(PlayTutorialTextSequence());
     }
 
-    IEnumerator HideTutorialTextAfterDelay(float delay)
+    IEnumerator PlayTutorialTextSequence()
     {
-        yield return new WaitForSeconds(delay);
+        string tutorialMessage = firstPlayTutorialMessage == null ? string.Empty : firstPlayTutorialMessage;
+        string[] lines = tutorialMessage.Split('\n');
+        if (lines.Length == 0)
+        {
+            lines = new string[] { string.Empty };
+        }
+
+        float[] lineAlphas = new float[lines.Length];
+        tutorialText.gameObject.SetActive(true);
+        tutorialText.text = BuildTutorialRichText(lines, lineAlphas);
+
+        float safeLineFadeInDuration = Mathf.Max(0f, tutorialLineFadeInDuration);
+        float safeLineStaggerDelay = Mathf.Max(0f, tutorialLineStaggerDelay);
+
+        for (int i = 0; i < lines.Length; i++)
+        {
+            float lineFadeDuration = safeLineFadeInDuration;
+            if (i == 0)
+            {
+                lineFadeDuration *= Mathf.Max(0f, tutorialFirstLineFadeInMultiplier);
+            }
+
+            if (lineFadeDuration <= 0f)
+            {
+                lineAlphas[i] = 1f;
+                tutorialText.text = BuildTutorialRichText(lines, lineAlphas);
+            }
+            else
+            {
+                float elapsed = 0f;
+                while (elapsed < lineFadeDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    lineAlphas[i] = Mathf.Clamp01(elapsed / lineFadeDuration);
+                    tutorialText.text = BuildTutorialRichText(lines, lineAlphas);
+                    yield return null;
+                }
+                lineAlphas[i] = 1f;
+                tutorialText.text = BuildTutorialRichText(lines, lineAlphas);
+            }
+
+            if (i < lines.Length - 1 && safeLineStaggerDelay > 0f)
+            {
+                yield return new WaitForSeconds(safeLineStaggerDelay);
+            }
+        }
+
+        float firstLineDuration = lines.Length > 0
+            ? safeLineFadeInDuration * Mathf.Max(0f, tutorialFirstLineFadeInMultiplier)
+            : 0f;
+        float remainingLinesDuration = safeLineFadeInDuration * Mathf.Max(0, lines.Length - 1);
+        float introDuration = firstLineDuration + remainingLinesDuration + (safeLineStaggerDelay * Mathf.Max(0, lines.Length - 1));
+        float safeFadeOutDuration = Mathf.Max(0f, tutorialFadeOutDuration);
+        float holdDuration = Mathf.Max(0f, tutorialTextDisplayDuration - introDuration - safeFadeOutDuration);
+        if (holdDuration > 0f)
+        {
+            yield return new WaitForSeconds(holdDuration);
+        }
+
+        if (safeFadeOutDuration > 0f)
+        {
+            float fadeElapsed = 0f;
+            while (fadeElapsed < safeFadeOutDuration)
+            {
+                fadeElapsed += Time.deltaTime;
+                float fadeMultiplier = 1f - Mathf.Clamp01(fadeElapsed / safeFadeOutDuration);
+                for (int i = 0; i < lineAlphas.Length; i++)
+                {
+                    lineAlphas[i] = fadeMultiplier;
+                }
+
+                tutorialText.text = BuildTutorialRichText(lines, lineAlphas);
+                yield return null;
+            }
+        }
 
         if (tutorialText != null)
         {
             tutorialText.gameObject.SetActive(false);
         }
+
+        tutorialTextRoutine = null;
+    }
+
+    string BuildTutorialRichText(string[] lines, float[] lineAlphas)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < lines.Length; i++)
+        {
+            int alphaByte = Mathf.Clamp(Mathf.RoundToInt(lineAlphas[i] * 255f), 0, 255);
+            sb.Append("<color=#FFFFFF");
+            sb.Append(alphaByte.ToString("X2"));
+            sb.Append(">");
+            sb.Append(lines[i]);
+            sb.Append("</color>");
+
+            if (i < lines.Length - 1)
+            {
+                sb.Append('\n');
+            }
+        }
+
+        return sb.ToString();
     }
 
     void OnGUI()
