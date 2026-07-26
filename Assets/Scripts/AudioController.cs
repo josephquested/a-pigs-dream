@@ -172,7 +172,7 @@ public class AudioController : MonoBehaviour
             return;
 
         int safeHunger = Mathf.Max(0, hungerPoints);
-        float pitch = 1f + ((8 - safeHunger) * 0.1f);
+        float pitch = 1f + ((8 - safeHunger) * 0.075f);
         starvingAudioSource.pitch = Mathf.Max(0f, pitch);
         starvingAudioSource.Play();
     }

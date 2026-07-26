@@ -29,6 +29,7 @@ public class GameController : MonoBehaviour
 
         timeRemaining = gameTime;
         score = 0;
+        CacheTimerTextDefaults();
         UpdateTimerDisplay();
         UpdateScoreDisplay();
         ShowFirstPlayTutorialIfNeeded();
@@ -47,9 +48,13 @@ public class GameController : MonoBehaviour
     public GameObject loadingHighscoresObj;
     public GameObject highscoresParent;
     public TextMeshProUGUI timerText;
+    public TextMeshProUGUI hungerLabelText;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI yourScoreText;
     public TextMeshProUGUI tutorialText;
+    public Color starvingTimerPulseColor = Color.red;
+    public float starvingTimerPulseScaleMultiplier = 1.22f;
+    public float starvingTimerPulseDuration = 0.2f;
     [TextArea(2, 6)] public string firstPlayTutorialMessage;
     public float tutorialTextDisplayDuration = 8f;
     public float tutorialLineFadeInDuration = 0.35f;
@@ -77,6 +82,11 @@ public class GameController : MonoBehaviour
     float scoreTickCounter;
     int score;
     Coroutine tutorialTextRoutine;
+    Coroutine starvingTimerPulseRoutine;
+    Vector3 timerBaseScale = Vector3.one;
+    Color timerBaseColor = Color.white;
+    Vector3 hungerLabelBaseScale = Vector3.one;
+    Color hungerLabelBaseColor = Color.white;
 
     public void GameOver()
     {
@@ -163,6 +173,7 @@ public class GameController : MonoBehaviour
             if (hungerPoints <= 8 && AudioController.Instance != null)
             {
                 AudioController.Instance.PlayStarvingTick(hungerPoints);
+                TriggerStarvingTimerPulse();
             }
             UpdateTimerDisplay();
             
@@ -185,7 +196,131 @@ public class GameController : MonoBehaviour
         if (timerText != null)
         {
             timerText.text = Mathf.Max(0, Mathf.FloorToInt(timeRemaining)).ToString();
+            if (Mathf.FloorToInt(timeRemaining) <= 0)
+            {
+                timerText.color = starvingTimerPulseColor;
+            }
         }
+
+        if (hungerLabelText != null && Mathf.FloorToInt(timeRemaining) <= 0)
+        {
+            hungerLabelText.color = starvingTimerPulseColor;
+        }
+    }
+
+    void CacheTimerTextDefaults()
+    {
+        if (timerText == null)
+        {
+            timerBaseScale = Vector3.one;
+            timerBaseColor = Color.white;
+        }
+        else
+        {
+            timerBaseScale = timerText.rectTransform.localScale;
+            timerBaseColor = timerText.color;
+        }
+
+        if (hungerLabelText == null)
+        {
+            hungerLabelBaseScale = Vector3.one;
+            hungerLabelBaseColor = Color.white;
+        }
+        else
+        {
+            hungerLabelBaseScale = hungerLabelText.rectTransform.localScale;
+            hungerLabelBaseColor = hungerLabelText.color;
+        }
+    }
+
+    void TriggerStarvingTimerPulse()
+    {
+        if (timerText == null && hungerLabelText == null)
+            return;
+
+        if (starvingTimerPulseRoutine != null)
+        {
+            StopCoroutine(starvingTimerPulseRoutine);
+        }
+
+        if (timerText != null)
+        {
+            timerText.rectTransform.localScale = timerBaseScale;
+            timerText.color = Mathf.FloorToInt(timeRemaining) <= 0 ? starvingTimerPulseColor : timerBaseColor;
+        }
+
+        if (hungerLabelText != null)
+        {
+            hungerLabelText.rectTransform.localScale = hungerLabelBaseScale;
+            hungerLabelText.color = Mathf.FloorToInt(timeRemaining) <= 0 ? starvingTimerPulseColor : hungerLabelBaseColor;
+        }
+
+        starvingTimerPulseRoutine = StartCoroutine(PlayStarvingTimerPulse());
+    }
+
+    IEnumerator PlayStarvingTimerPulse()
+    {
+        float duration = Mathf.Max(0.01f, starvingTimerPulseDuration);
+        float halfDuration = duration * 0.5f;
+        float scaleMultiplier = Mathf.Max(1f, starvingTimerPulseScaleMultiplier);
+        Vector3 pulseScale = timerBaseScale * scaleMultiplier;
+        Vector3 hungerLabelPulseScale = hungerLabelBaseScale * scaleMultiplier;
+        Color endColor = Mathf.FloorToInt(timeRemaining) <= 0 ? starvingTimerPulseColor : timerBaseColor;
+        Color hungerLabelEndColor = Mathf.FloorToInt(timeRemaining) <= 0 ? starvingTimerPulseColor : hungerLabelBaseColor;
+
+        float elapsed = 0f;
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / halfDuration);
+            if (timerText != null)
+            {
+                timerText.rectTransform.localScale = Vector3.Lerp(timerBaseScale, pulseScale, t);
+                timerText.color = Color.Lerp(timerBaseColor, starvingTimerPulseColor, t);
+            }
+
+            if (hungerLabelText != null)
+            {
+                hungerLabelText.rectTransform.localScale = Vector3.Lerp(hungerLabelBaseScale, hungerLabelPulseScale, t);
+                hungerLabelText.color = Color.Lerp(hungerLabelBaseColor, starvingTimerPulseColor, t);
+            }
+
+            yield return null;
+        }
+
+        elapsed = 0f;
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / halfDuration);
+            if (timerText != null)
+            {
+                timerText.rectTransform.localScale = Vector3.Lerp(pulseScale, timerBaseScale, t);
+                timerText.color = Color.Lerp(starvingTimerPulseColor, endColor, t);
+            }
+
+            if (hungerLabelText != null)
+            {
+                hungerLabelText.rectTransform.localScale = Vector3.Lerp(hungerLabelPulseScale, hungerLabelBaseScale, t);
+                hungerLabelText.color = Color.Lerp(starvingTimerPulseColor, hungerLabelEndColor, t);
+            }
+
+            yield return null;
+        }
+
+        if (timerText != null)
+        {
+            timerText.rectTransform.localScale = timerBaseScale;
+            timerText.color = endColor;
+        }
+
+        if (hungerLabelText != null)
+        {
+            hungerLabelText.rectTransform.localScale = hungerLabelBaseScale;
+            hungerLabelText.color = hungerLabelEndColor;
+        }
+
+        starvingTimerPulseRoutine = null;
     }
 
     void UpdateScore()

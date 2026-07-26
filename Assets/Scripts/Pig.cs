@@ -395,7 +395,7 @@ public class Pig : MonoBehaviour
         if (other.CompareTag("Apple"))
         {
             Destroy(other.gameObject);
-            gameController.AddTime(10f);
+            gameController.AddTime(8f);
             gameController.AddScorePoints(1);
 
             if (AudioController.Instance != null)

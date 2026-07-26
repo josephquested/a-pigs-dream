@@ -5665,9 +5665,13 @@ MonoBehaviour:
   loadingHighscoresObj: {fileID: 2046908318}
   highscoresParent: {fileID: 366164226}
   timerText: {fileID: 353766108}
+  hungerLabelText: {fileID: 1718714867}
   scoreText: {fileID: 1329684601}
   yourScoreText: {fileID: 964138315}
   tutorialText: {fileID: 1170970498}
+  starvingTimerPulseColor: {r: 1, g: 0, b: 0, a: 1}
+  starvingTimerPulseScaleMultiplier: 1.22
+  starvingTimerPulseDuration: 0.2
   firstPlayTutorialMessage: 'Press z to jump
 
 
@@ -15299,7 +15303,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 4f04e7af886efa64a9895f9a517833da, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.6
   m_Pitch: 1
   Loop: 0
   Mute: 0
