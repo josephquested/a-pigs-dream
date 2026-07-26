@@ -7,9 +7,13 @@ public class MenuController : MonoBehaviour
 
     public GameObject startingParent;
     public GameObject nameEntryParent;
+    public AudioSource confirmAudioSource;
+    public AudioSource typingAudioSource;
+    public AudioClip[] typingSoundEffects = new AudioClip[2];
 
     bool nameEntryFlowStarted;
     bool isSubmittingPlayerName;
+    int nextTypingSoundIndex;
 
     void Start()
     {
@@ -18,7 +22,18 @@ public class MenuController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        bool enterPressed = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
+        if (enterPressed)
+        {
+            PlayIfAssigned(confirmAudioSource);
+        }
+
+        if (nameEntryFlowStarted && Input.anyKeyDown && !enterPressed)
+        {
+            PlayTypingSound();
+        }
+
+        if (enterPressed)
         {
             if (!nameEntryFlowStarted)
                 return;
@@ -30,8 +45,51 @@ public class MenuController : MonoBehaviour
         }
     }
 
+    void PlayTypingSound()
+    {
+        if (typingAudioSource == null)
+            return;
+
+        if (typingSoundEffects != null && typingSoundEffects.Length > 0)
+        {
+            int attempts = 0;
+            int clipIndex = nextTypingSoundIndex;
+            AudioClip clip = null;
+
+            while (attempts < typingSoundEffects.Length)
+            {
+                clipIndex %= typingSoundEffects.Length;
+                clip = typingSoundEffects[clipIndex];
+                clipIndex++;
+                attempts++;
+
+                if (clip != null)
+                    break;
+            }
+
+            nextTypingSoundIndex = clipIndex % typingSoundEffects.Length;
+
+            if (clip != null)
+            {
+                typingAudioSource.PlayOneShot(clip);
+                return;
+            }
+        }
+
+        typingAudioSource.Play();
+    }
+
+    void PlayIfAssigned(AudioSource source)
+    {
+        if (source != null)
+        {
+            source.Play();
+        }
+    }
+
     public void OpenNameEntry()
     {
+        PlayIfAssigned(confirmAudioSource);
         nameEntryFlowStarted = true;
 
         if (startingParent != null)
