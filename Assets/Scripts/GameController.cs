@@ -66,6 +66,7 @@ public class GameController : MonoBehaviour
     bool isGameOver = false;
     bool isGameOverScreenVisible = false;
     float timeRemaining;
+    public float TimeRemaining => timeRemaining;
     float timerTickCounter;
     float scoreTickCounter;
     int score;

@@ -85,6 +85,7 @@ public class Pig : MonoBehaviour
     float dashSpeedTimer;
     float fallSpeed;
     float currentForwardSpeed;
+    public float CurrentForwardSpeed => currentForwardSpeed;
     float currentSideSpeed;
 
     bool isJumping;
@@ -398,7 +399,7 @@ public class Pig : MonoBehaviour
         {
             Destroy(other.gameObject);
             gameController.AddTime(8f);
-            gameController.AddScorePoints(1);
+            gameController.AddScorePoints(3);
 
             if (AudioController.Instance != null)
             {

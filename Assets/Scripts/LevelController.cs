@@ -6,6 +6,8 @@ public class LevelController : MonoBehaviour
     // -- SYSTEM -- //
 
     GameObject pig;
+    Pig pigScript;
+    GameController gameController;
     bool isFirstPlayRun;
     int firstPlayBlankChunksRemaining;
 
@@ -21,6 +23,8 @@ public class LevelController : MonoBehaviour
     void Start()
     {
         pig = GameObject.FindGameObjectWithTag("Pig");
+        pigScript = pig != null ? pig.GetComponent<Pig>() : null;
+        gameController = GameObject.FindFirstObjectByType<GameController>();
         
         // Load all level chunk prefabs from Resources folder
         levelChunkPrefabs = Resources.LoadAll<GameObject>("LevelChunks");
@@ -217,8 +221,10 @@ public class LevelController : MonoBehaviour
             currentLaneCenterX += chunkSize * turnDirection;
         }
         
-        // Determine if apple should spawn based on reverse blank-chunk difficulty progression.
-        bool shouldSpawnApple = Random.Range(0f, 100f) < GetCurrentAppleSpawnChance();
+        // Determine if apple should spawn. Always spawn in the chunk where the pig would die of
+        // hunger given current speed and time remaining (so there's always one just within reach).
+        bool isDeathChunk = IsDeathChunk(nextChunkZ);
+        bool shouldSpawnApple = isDeathChunk || Random.Range(0f, 100f) < GetCurrentAppleSpawnChance();
         if (levelChunk != null && shouldSpawnApple)
         {
             levelChunk.SpawnApple(applePrefab);
@@ -434,6 +440,28 @@ public class LevelController : MonoBehaviour
         }
 
         return false;
+    }
+
+    // Returns true if the chunk at chunkZ is where the pig would die of hunger
+    // given its current speed, acceleration, and time remaining.
+    bool IsDeathChunk(float chunkZ)
+    {
+        if (pig == null || pigScript == null || gameController == null)
+            return false;
+
+        float timeLeft = gameController.TimeRemaining;
+        if (timeLeft <= 0f)
+            return false;
+
+        float v0 = pigScript.CurrentForwardSpeed;
+        float a = pigScript.speedIncreasePerSecond;
+        float pigZ = pig.transform.position.z;
+
+        // Kinematic forecast: z = z0 + v0*t + 0.5*a*t^2
+        float deathZ = pigZ + v0 * timeLeft + 0.5f * a * timeLeft * timeLeft;
+
+        // Match the death chunk and the chunk immediately before it.
+        return deathZ >= chunkZ && deathZ < chunkZ + (chunkSize * 2f);
     }
 
     float GetCurrentBlankChance()
