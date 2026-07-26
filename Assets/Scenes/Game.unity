@@ -9754,7 +9754,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0.268, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 211.69995, y: -136}
+  m_AnchoredPosition: {x: 211.7002, y: -136}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1718714867
@@ -15809,14 +15809,14 @@ MonoBehaviour:
   blankLevelChunkPrefab: {fileID: 1828136827953393609, guid: deac5430db3ff0e43a9aa126cec6817a, type: 3}
   waterChunkPrefab: {fileID: 1828136827953393609, guid: 15c70ee631f29a04387a0a8ce3557a0e, type: 3}
   fireflyParticles: {fileID: 5563946577678197634, guid: 6f1fd7d512385bf4eb2048ddc304c192, type: 3}
-  earlyAppleSpawnChance: 10
-  lateAppleSpawnChance: 50
+  earlyAppleSpawnChance: 3
+  lateAppleSpawnChance: 11
   appleSpawnRampExponent: 1
   applePrefab: {fileID: 2630773314890223559, guid: e4f00bb8d4706414eb87ea33289f781c, type: 3}
   decorationObjects:
   - {fileID: 5515592980602078462, guid: c2bbe3042e22f4a4d9d532e4c0ef8035, type: 3}
-  minDecorationsToSpawn: 5
-  maxDecorationsToSpawn: 10
+  minDecorationsToSpawn: 3
+  maxDecorationsToSpawn: 15
   edgeChunkPrefab: {fileID: 1921689970243370568, guid: 73bd5b025c2d33e43aba0f263a011727, type: 3}
   rightTurningChunkPrefab: {fileID: 1828136827953393609, guid: 5cc32c527acc9b2408b7fab15b208457, type: 3}
   leftTurningChunkPrefab: {fileID: 1828136827953393609, guid: 858fee5272852d24a89999c06a95e8c2, type: 3}
