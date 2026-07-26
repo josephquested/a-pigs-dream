@@ -86,6 +86,7 @@ MonoBehaviour:
   randomizeYRotation: 1
   spawnYOffset: 0
   isWaterChunk: 0
+  disableSpawnedObjectColliders: 0
 --- !u!1 &3311261860323820430
 GameObject:
   m_ObjectHideFlags: 0
