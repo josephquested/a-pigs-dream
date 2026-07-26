@@ -21,6 +21,7 @@ public class AudioController : MonoBehaviour
     public AudioClip[] crashDeathClips;
     public AudioSource applePickupAudioSource;
     public AudioSource bushBreakAudioSource;
+    public AudioSource starvingAudioSource;
 
     float runningTargetVolume = 1f;
     bool runningLoopWantsToPlay;
@@ -163,6 +164,17 @@ public class AudioController : MonoBehaviour
     public void PlayBushBreak()
     {
         PlayIfAssigned(bushBreakAudioSource);
+    }
+
+    public void PlayStarvingTick(int hungerPoints)
+    {
+        if (starvingAudioSource == null)
+            return;
+
+        int safeHunger = Mathf.Max(0, hungerPoints);
+        float pitch = 1f + ((8 - safeHunger) * 0.1f);
+        starvingAudioSource.pitch = Mathf.Max(0f, pitch);
+        starvingAudioSource.Play();
     }
 
     void PlayIfAssigned(AudioSource source)

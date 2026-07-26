@@ -159,6 +159,11 @@ public class GameController : MonoBehaviour
         {
             timeRemaining -= 1f;
             timerTickCounter = 0f;
+            int hungerPoints = Mathf.Max(0, Mathf.FloorToInt(timeRemaining));
+            if (hungerPoints <= 8 && AudioController.Instance != null)
+            {
+                AudioController.Instance.PlayStarvingTick(hungerPoints);
+            }
             UpdateTimerDisplay();
             
             if (timeRemaining <= 0)
