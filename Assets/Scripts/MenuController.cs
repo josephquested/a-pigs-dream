@@ -7,9 +7,7 @@ public class MenuController : MonoBehaviour
 
     public GameObject startingParent;
     public GameObject nameEntryParent;
-    public GameObject startGameParent;
 
-    bool canStartGame;
     bool nameEntryFlowStarted;
 
     void Start()
@@ -24,13 +22,7 @@ public class MenuController : MonoBehaviour
             if (!nameEntryFlowStarted)
                 return;
 
-            if (!canStartGame)
-            {
-                SubmitPlayerName();
-                return;
-            }
-
-            SceneManager.LoadScene("Game");
+            SubmitPlayerNameAndStartGame();
         }
     }
 
@@ -43,12 +35,9 @@ public class MenuController : MonoBehaviour
 
         if (nameEntryParent != null)
             nameEntryParent.SetActive(true);
-
-        if (startGameParent != null)
-            startGameParent.SetActive(false);
     }
 
-    void SubmitPlayerName()
+    void SubmitPlayerNameAndStartGame()
     {
         if (LootManager.Instance == null)
         {
@@ -65,12 +54,6 @@ public class MenuController : MonoBehaviour
         if (string.IsNullOrEmpty(enteredName) || string.IsNullOrEmpty(enteredName.Trim()))
             return;
 
-        canStartGame = true;
-
-        if (nameEntryParent != null)
-            nameEntryParent.SetActive(false);
-
-        if (startGameParent != null)
-            startGameParent.SetActive(true);
+        SceneManager.LoadScene("Game");
     }
 }
