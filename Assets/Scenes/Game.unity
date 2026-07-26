@@ -5701,14 +5701,6 @@ MonoBehaviour:
   - {fileID: 1538017055}
   gameTime: 30
   gameOverScreenDelay: 1
-  showResetTutorialDebugButton: 1
-  resetTutorialDebugButtonPosition: {x: 20, y: 20}
-  resetTutorialDebugButtonSize: {x: 260, y: 40}
-  resetTutorialDebugButtonLabel: 'DEBUG: Reset First-Play Tutorial'
-  showMarkTutorialSeenDebugButton: 1
-  markTutorialSeenDebugButtonOffset: {x: 0, y: 48}
-  markTutorialSeenDebugButtonLabel: 'DEBUG: Mark Tutorial Seen'
-  reloadSceneAfterTutorialReset: 1
 --- !u!4 &238776684
 Transform:
   m_ObjectHideFlags: 0
@@ -6935,7 +6927,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 405ddfee79ae4c54aac5b87d165f302c, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.55
+  m_Volume: 0.49
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -15817,7 +15809,9 @@ MonoBehaviour:
   blankLevelChunkPrefab: {fileID: 1828136827953393609, guid: deac5430db3ff0e43a9aa126cec6817a, type: 3}
   waterChunkPrefab: {fileID: 1828136827953393609, guid: 15c70ee631f29a04387a0a8ce3557a0e, type: 3}
   fireflyParticles: {fileID: 5563946577678197634, guid: 6f1fd7d512385bf4eb2048ddc304c192, type: 3}
-  appleSpawnChance: 12
+  earlyAppleSpawnChance: 10
+  lateAppleSpawnChance: 50
+  appleSpawnRampExponent: 1
   applePrefab: {fileID: 2630773314890223559, guid: e4f00bb8d4706414eb87ea33289f781c, type: 3}
   decorationObjects:
   - {fileID: 5515592980602078462, guid: c2bbe3042e22f4a4d9d532e4c0ef8035, type: 3}
@@ -15829,7 +15823,7 @@ MonoBehaviour:
   turnChunkChance: 7
   minChunksBetweenRightTurns: 10
   blankChunksAfterRightTurn: 1
-  guaranteedInitialBlankChunks: 4
+  guaranteedInitialBlankChunks: 6
   chunksBehindToKeep: 2
   startingBlankChunkChance: 0.7
   minimumBlankChunkChance: 0.08
