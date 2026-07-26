@@ -9,6 +9,7 @@ public class MenuController : MonoBehaviour
     public GameObject nameEntryParent;
 
     bool nameEntryFlowStarted;
+    bool isSubmittingPlayerName;
 
     void Start()
     {
@@ -20,6 +21,9 @@ public class MenuController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
         {
             if (!nameEntryFlowStarted)
+                return;
+
+            if (isSubmittingPlayerName)
                 return;
 
             SubmitPlayerNameAndStartGame();
@@ -45,15 +49,26 @@ public class MenuController : MonoBehaviour
             return;
         }
 
-        LootManager.Instance.UpdatePlayerName();
-
         if (LootManager.Instance.playerNameInputField == null)
             return;
 
-        string enteredName = LootManager.Instance.playerNameInputField.text;
-        if (string.IsNullOrEmpty(enteredName) || string.IsNullOrEmpty(enteredName.Trim()))
+        string enteredName = LootManager.Instance.playerNameInputField.text.Trim();
+        if (string.IsNullOrEmpty(enteredName))
             return;
 
-        SceneManager.LoadScene("Game");
+        isSubmittingPlayerName = true;
+
+        LootManager.Instance.UpdatePlayerName((wasUpdated) =>
+        {
+            isSubmittingPlayerName = false;
+
+            if (!wasUpdated)
+            {
+                Debug.LogWarning("Player name update failed. Not loading game scene.");
+                return;
+            }
+
+            SceneManager.LoadScene("Game");
+        });
     }
 }

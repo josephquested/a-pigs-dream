@@ -89,14 +89,20 @@ public class LootManager : MonoBehaviour
         }
     }
 
-    public void UpdatePlayerName()
+    public void UpdatePlayerName(Action<bool> onComplete)
     {
         if (playerNameInputField == null)
+        {
+            onComplete?.Invoke(false);
             return;
+        }
 
         string enteredName = playerNameInputField.text.Trim();
         if (string.IsNullOrEmpty(enteredName))
+        {
+            onComplete?.Invoke(false);
             return;
+        }
 
         string _name = enteredName.ToUpperInvariant();
         if (_name.Length > 10)
@@ -115,10 +121,12 @@ public class LootManager : MonoBehaviour
             if (response.success)
             {
                 print("set name");
+                onComplete?.Invoke(true);
             }
             else
             {
                 print("failed to set name");
+                onComplete?.Invoke(false);
             }
         });
     }
