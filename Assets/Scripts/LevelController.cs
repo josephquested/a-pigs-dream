@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 public class LevelController : MonoBehaviour
 {
-    const string FirstPlayTutorialSeenKey = "FIRST_PLAY_TUTORIAL_SEEN";
-
     // -- SYSTEM -- //
 
     GameObject pig;
@@ -15,12 +13,7 @@ public class LevelController : MonoBehaviour
 
     void Awake()
     {
-        isFirstPlayRun = PlayerPrefs.GetInt(FirstPlayTutorialSeenKey, 0) == 0;
-        if (isFirstPlayRun)
-        {
-            PlayerPrefs.SetInt(FirstPlayTutorialSeenKey, 1);
-            PlayerPrefs.Save();
-        }
+        isFirstPlayRun = GameFlowState.ConsumeShouldPlayTutorialOnGameLoad();
 
         firstPlayBlankChunksRemaining = isFirstPlayRun ? Mathf.Max(0, firstPlayTutorialBlankChunks) : 0;
     }

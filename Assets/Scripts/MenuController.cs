@@ -125,6 +125,7 @@ public class MenuController : MonoBehaviour
                 return;
             }
 
+            GameFlowState.MarkMenuToGameTransition();
             SceneManager.LoadScene("Game");
         });
     }
