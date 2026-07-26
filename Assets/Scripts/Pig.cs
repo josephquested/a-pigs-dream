@@ -11,37 +11,19 @@ public class Pig : MonoBehaviour
 
     GameController gameController;
     bool isAlive = true;
-    bool isPaused;
     float originalGroundY;
     Rigidbody pigRigidbody;
-    bool originalRigidbodyKinematic;
-    bool originalRigidbodyDetectCollisions;
 
     void Awake()
     {
         gameController = GameObject.FindFirstObjectByType<GameController>();
         originalGroundY = transform.position.y;
         pigRigidbody = GetComponent<Rigidbody>();
-
-        if (pigRigidbody != null)
-        {
-            originalRigidbodyKinematic = pigRigidbody.isKinematic;
-            originalRigidbodyDetectCollisions = pigRigidbody.detectCollisions;
-        }
     }
 
     void Update()
     {
         if (!isAlive)
-            return;
-
-        if (Input.GetKeyDown(KeyCode.Slash))
-        {
-            TogglePause();
-            return;
-        }
-
-        if (isPaused)
             return;
 
         CheckGround();
@@ -115,25 +97,6 @@ public class Pig : MonoBehaviour
     {
         currentForwardSpeed = forwardSpeed;
         currentSideSpeed = sideSpeed;
-    }
-
-    void TogglePause()
-    {
-        isPaused = !isPaused;
-        GameFlowState.SetPigPaused(isPaused);
-
-        if (pigRigidbody != null)
-        {
-            pigRigidbody.linearVelocity = Vector3.zero;
-            pigRigidbody.angularVelocity = Vector3.zero;
-            pigRigidbody.isKinematic = isPaused ? true : originalRigidbodyKinematic;
-            pigRigidbody.detectCollisions = isPaused ? false : originalRigidbodyDetectCollisions;
-        }
-
-        if (pigAnimator != null)
-        {
-            pigAnimator.speed = isPaused ? 0f : 1f;
-        }
     }
 
     void UpdateSpeedProgression()
