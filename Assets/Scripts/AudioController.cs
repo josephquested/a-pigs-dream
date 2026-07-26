@@ -22,6 +22,7 @@ public class AudioController : MonoBehaviour
     public AudioSource applePickupAudioSource;
     public AudioSource bushBreakAudioSource;
     public AudioSource starvingAudioSource;
+    public AudioSource confirmAudioSource;
 
     float runningTargetVolume = 1f;
     bool runningLoopWantsToPlay;
@@ -164,6 +165,11 @@ public class AudioController : MonoBehaviour
     public void PlayBushBreak()
     {
         PlayIfAssigned(bushBreakAudioSource);
+    }
+
+    public void PlayConfirm()
+    {
+        PlayIfAssigned(confirmAudioSource);
     }
 
     public void PlayStarvingTick(int hungerPoints)

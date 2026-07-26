@@ -338,9 +338,20 @@ public class GameController : MonoBehaviour
     {
         if (isGameOverScreenVisible && Input.GetKeyDown(KeyCode.Return))
         {
-            GameFlowState.MarkGameToGameReload();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            StartCoroutine(RestartWithConfirmSound());
         }
+    }
+
+    IEnumerator RestartWithConfirmSound()
+    {
+        isGameOverScreenVisible = false;
+        if (AudioController.Instance != null)
+        {
+            AudioController.Instance.PlayConfirm();
+        }
+        yield return new WaitForSeconds(0.5f);
+        GameFlowState.MarkGameToGameReload();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void GetScores()
