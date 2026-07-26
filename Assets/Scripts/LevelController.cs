@@ -3,9 +3,27 @@ using System.Collections.Generic;
 
 public class LevelController : MonoBehaviour
 {
+    const string FirstPlayTutorialSeenKey = "FIRST_PLAY_TUTORIAL_SEEN";
+
     // -- SYSTEM -- //
 
     GameObject pig;
+    bool isFirstPlayRun;
+    int firstPlayBlankChunksRemaining;
+
+    public bool IsFirstPlayRun => isFirstPlayRun;
+
+    void Awake()
+    {
+        isFirstPlayRun = PlayerPrefs.GetInt(FirstPlayTutorialSeenKey, 0) == 0;
+        if (isFirstPlayRun)
+        {
+            PlayerPrefs.SetInt(FirstPlayTutorialSeenKey, 1);
+            PlayerPrefs.Save();
+        }
+
+        firstPlayBlankChunksRemaining = isFirstPlayRun ? Mathf.Max(0, firstPlayTutorialBlankChunks) : 0;
+    }
 
     void Start()
     {
@@ -53,6 +71,7 @@ public class LevelController : MonoBehaviour
     // -- LEVEL -- //
 
     public int chunksAhead = 10;
+    public int firstPlayTutorialBlankChunks = 10;
     public GameObject blankLevelChunkPrefab;
     public GameObject waterChunkPrefab;
     public GameObject fireflyParticles;
@@ -198,6 +217,18 @@ public class LevelController : MonoBehaviour
 
     GameObject SelectChunkPrefab()
     {
+        if (firstPlayBlankChunksRemaining > 0)
+        {
+            if (blankLevelChunkPrefab != null)
+            {
+                firstPlayBlankChunksRemaining--;
+                return blankLevelChunkPrefab;
+            }
+
+            firstPlayBlankChunksRemaining = 0;
+            Debug.LogWarning("First-play tutorial blank chunks requested, but blankLevelChunkPrefab is not assigned.");
+        }
+
         if (blankLevelChunkPrefab != null && chunksSpawned < Mathf.Max(0, guaranteedInitialBlankChunks))
         {
             return blankLevelChunkPrefab;

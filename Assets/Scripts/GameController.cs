@@ -7,6 +7,8 @@ using LootLocker.Requests;
 
 public class GameController : MonoBehaviour
 {
+    const string FirstPlayTutorialSeenKey = "FIRST_PLAY_TUTORIAL_SEEN";
+
     // -- SYSTEM -- //
 
     CameraController cameraController;
@@ -28,6 +30,7 @@ public class GameController : MonoBehaviour
         score = 0;
         UpdateTimerDisplay();
         UpdateScoreDisplay();
+        ShowFirstPlayTutorialIfNeeded();
     }
 
     void Update()
@@ -45,9 +48,22 @@ public class GameController : MonoBehaviour
     public TextMeshProUGUI timerText;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI yourScoreText;
+    public TextMeshProUGUI tutorialText;
+    [TextArea(2, 6)] public string firstPlayTutorialMessage = "CONTROLS:\nZ = JUMP\nX = DASH\nARROWS/A-D = MOVE\nCOLLECT APPLES TO SURVIVE";
+    public float tutorialTextDisplayDuration = 8f;
     public List<TextMeshProUGUI> highscoreUIs = new List<TextMeshProUGUI>();
     public float gameTime = 60f;
     public float gameOverScreenDelay = 1f;
+
+    [Header("DEBUG")]
+    public bool showResetTutorialDebugButton = true;
+    public Vector2 resetTutorialDebugButtonPosition = new Vector2(20f, 20f);
+    public Vector2 resetTutorialDebugButtonSize = new Vector2(260f, 40f);
+    public string resetTutorialDebugButtonLabel = "DEBUG: Reset First-Play Tutorial";
+    public bool showMarkTutorialSeenDebugButton = true;
+    public Vector2 markTutorialSeenDebugButtonOffset = new Vector2(0f, 48f);
+    public string markTutorialSeenDebugButtonLabel = "DEBUG: Mark Tutorial Seen";
+    public bool reloadSceneAfterTutorialReset = true;
 
     bool isGameOver = false;
     bool isGameOverScreenVisible = false;
@@ -246,6 +262,94 @@ public class GameController : MonoBehaviour
             }
 
             i++;
+        }
+    }
+
+    void ShowFirstPlayTutorialIfNeeded()
+    {
+        bool shouldShowTutorial = levelController != null
+            ? levelController.IsFirstPlayRun
+            : PlayerPrefs.GetInt(FirstPlayTutorialSeenKey, 0) == 0;
+
+        if (!shouldShowTutorial || tutorialText == null)
+            return;
+
+        tutorialText.text = firstPlayTutorialMessage;
+        tutorialText.gameObject.SetActive(true);
+
+        if (tutorialTextDisplayDuration > 0f)
+        {
+            StartCoroutine(HideTutorialTextAfterDelay(tutorialTextDisplayDuration));
+        }
+    }
+
+    IEnumerator HideTutorialTextAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (tutorialText != null)
+        {
+            tutorialText.gameObject.SetActive(false);
+        }
+    }
+
+    void OnGUI()
+    {
+        if (!showResetTutorialDebugButton)
+            return;
+
+        if (!Application.isEditor && !Debug.isDebugBuild)
+            return;
+
+        Rect buttonRect = new Rect(
+            resetTutorialDebugButtonPosition.x,
+            resetTutorialDebugButtonPosition.y,
+            resetTutorialDebugButtonSize.x,
+            resetTutorialDebugButtonSize.y
+        );
+
+        if (GUI.Button(buttonRect, resetTutorialDebugButtonLabel))
+        {
+            ResetFirstPlayTutorialDebug();
+        }
+
+        if (!showMarkTutorialSeenDebugButton)
+            return;
+
+        Rect markSeenButtonRect = new Rect(
+            resetTutorialDebugButtonPosition.x + markTutorialSeenDebugButtonOffset.x,
+            resetTutorialDebugButtonPosition.y + markTutorialSeenDebugButtonOffset.y,
+            resetTutorialDebugButtonSize.x,
+            resetTutorialDebugButtonSize.y
+        );
+
+        if (GUI.Button(markSeenButtonRect, markTutorialSeenDebugButtonLabel))
+        {
+            MarkFirstPlayTutorialSeenDebug();
+        }
+    }
+
+    public void ResetFirstPlayTutorialDebug()
+    {
+        PlayerPrefs.DeleteKey(FirstPlayTutorialSeenKey);
+        PlayerPrefs.Save();
+        Debug.Log("Reset first-play tutorial flag.");
+
+        if (reloadSceneAfterTutorialReset)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+    }
+
+    public void MarkFirstPlayTutorialSeenDebug()
+    {
+        PlayerPrefs.SetInt(FirstPlayTutorialSeenKey, 1);
+        PlayerPrefs.Save();
+        Debug.Log("Marked first-play tutorial as seen.");
+
+        if (reloadSceneAfterTutorialReset)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 }
