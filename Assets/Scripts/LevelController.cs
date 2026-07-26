@@ -31,6 +31,25 @@ public class LevelController : MonoBehaviour
         UpdateLevelGeneration();
     }
 
+    public void DisableLevelAndPig()
+    {
+        if (pig != null)
+        {
+            pig.SetActive(false);
+        }
+
+        for (int i = 0; i < spawnedChunks.Count; i++)
+        {
+            GameObject chunk = spawnedChunks[i];
+            if (chunk != null)
+            {
+                chunk.SetActive(false);
+            }
+        }
+
+        enabled = false;
+    }
+
     // -- LEVEL -- //
 
     public int chunksAhead = 10;

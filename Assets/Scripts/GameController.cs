@@ -9,8 +9,13 @@ public class GameController : MonoBehaviour
 {
     // -- SYSTEM -- //
 
+    CameraController cameraController;
+    LevelController levelController;
+
     void Start()
     {
+        cameraController = GameObject.FindFirstObjectByType<CameraController>();
+        levelController = GameObject.FindFirstObjectByType<LevelController>();
         timeRemaining = gameTime;
         score = 0;
         UpdateTimerDisplay();
@@ -63,6 +68,17 @@ public class GameController : MonoBehaviour
 
         gameOverScreen.SetActive(true);
         isGameOverScreenVisible = true;
+
+        if (cameraController != null)
+        {
+            cameraController.ResetToStartPosition();
+        }
+
+        if (levelController != null)
+        {
+            levelController.DisableLevelAndPig();
+        }
+
         Debug.Log("Game Over!");
 
         if (LootManager.Instance != null)
