@@ -120,6 +120,7 @@ public class Pig : MonoBehaviour
     void TogglePause()
     {
         isPaused = !isPaused;
+        GameFlowState.SetPigPaused(isPaused);
 
         if (pigRigidbody != null)
         {

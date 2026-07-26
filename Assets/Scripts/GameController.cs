@@ -149,7 +149,7 @@ public class GameController : MonoBehaviour
 
     void UpdateTimer()
     {
-        if (isGameOver)
+        if (isGameOver || GameFlowState.IsPigPaused())
             return;
 
         timerTickCounter += Time.deltaTime;

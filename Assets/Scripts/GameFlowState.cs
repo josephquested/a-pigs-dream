@@ -1,6 +1,7 @@
 public static class GameFlowState
 {
     static bool shouldPlayTutorialOnNextGameLoad;
+    static bool isPigPaused;
 
     public static void MarkMenuToGameTransition()
     {
@@ -17,5 +18,15 @@ public static class GameFlowState
         bool shouldPlay = shouldPlayTutorialOnNextGameLoad;
         shouldPlayTutorialOnNextGameLoad = false;
         return shouldPlay;
+    }
+
+    public static void SetPigPaused(bool paused)
+    {
+        isPigPaused = paused;
+    }
+
+    public static bool IsPigPaused()
+    {
+        return isPigPaused;
     }
 }
