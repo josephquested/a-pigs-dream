@@ -25,8 +25,8 @@ Transform:
   m_GameObject: {fileID: 5515592980602078462}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.16, z: 0}
-  m_LocalScale: {x: 0.40289, y: 0.40289, z: 0.40289}
+  m_LocalPosition: {x: 0, y: -0.097, z: 0}
+  m_LocalScale: {x: 0.7273373, y: 0.7273373, z: 0.7273373}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3275504905215915322}
@@ -42,15 +42,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 7ef4f6dcd343c4592bfb01567be48095, type: 3}
       propertyPath: m_LocalScale.x
-      value: 295.20825
+      value: 643.66394
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7ef4f6dcd343c4592bfb01567be48095, type: 3}
       propertyPath: m_LocalScale.y
-      value: 405.4696
+      value: 884.07477
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7ef4f6dcd343c4592bfb01567be48095, type: 3}
       propertyPath: m_LocalScale.z
-      value: 281.87326
+      value: 614.5887
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7ef4f6dcd343c4592bfb01567be48095, type: 3}
       propertyPath: m_LocalPosition.x
@@ -58,7 +58,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7ef4f6dcd343c4592bfb01567be48095, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.2
+      value: -0.67
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7ef4f6dcd343c4592bfb01567be48095, type: 3}
       propertyPath: m_LocalPosition.z
@@ -99,8 +99,28 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7ef4f6dcd343c4592bfb01567be48095, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3033149770774293364}
   m_SourcePrefab: {fileID: 100100000, guid: 7ef4f6dcd343c4592bfb01567be48095, type: 3}
+--- !u!1 &2755990730869698432 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 7ef4f6dcd343c4592bfb01567be48095, type: 3}
+  m_PrefabInstance: {fileID: 3098009414964925137}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3033149770774293364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2755990730869698432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f229935388dbc943abdeb0ee1742b1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RandomiseYRotation
 --- !u!4 &3275504905215915322 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7ef4f6dcd343c4592bfb01567be48095, type: 3}
