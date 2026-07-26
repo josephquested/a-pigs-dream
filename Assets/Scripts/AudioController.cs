@@ -25,6 +25,7 @@ public class AudioController : MonoBehaviour
     float runningTargetVolume = 1f;
     bool runningLoopWantsToPlay;
     float bgmTargetVolume = 1f;
+    bool isBGMMuted;
     Coroutine bgmFadeCoroutine;
 
     void Awake()
@@ -53,6 +54,7 @@ public class AudioController : MonoBehaviour
     void Update()
     {
         UpdateRunningLoopFade();
+        UpdateBGMMuteToggle();
     }
 
     public void PlayJump()
@@ -72,7 +74,7 @@ public class AudioController : MonoBehaviour
         }
 
         bgmAudioSource.loop = true;
-        bgmAudioSource.volume = bgmTargetVolume;
+        bgmAudioSource.volume = GetCurrentBGMVolumeTarget();
         if (!bgmAudioSource.isPlaying)
         {
             bgmAudioSource.Play();
@@ -92,7 +94,7 @@ public class AudioController : MonoBehaviour
 
         if (!bgmAudioSource.isPlaying)
         {
-            bgmAudioSource.volume = bgmTargetVolume;
+            bgmAudioSource.volume = GetCurrentBGMVolumeTarget();
             return;
         }
 
@@ -231,7 +233,40 @@ public class AudioController : MonoBehaviour
         }
 
         bgmAudioSource.Stop();
-        bgmAudioSource.volume = bgmTargetVolume;
+        bgmAudioSource.volume = GetCurrentBGMVolumeTarget();
         bgmFadeCoroutine = null;
+    }
+
+    void UpdateBGMMuteToggle()
+    {
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            ToggleBGMMute();
+        }
+    }
+
+    void ToggleBGMMute()
+    {
+        if (bgmAudioSource == null)
+            return;
+
+        if (bgmFadeCoroutine != null)
+        {
+            StopCoroutine(bgmFadeCoroutine);
+            bgmFadeCoroutine = null;
+        }
+
+        isBGMMuted = !isBGMMuted;
+        bgmAudioSource.volume = GetCurrentBGMVolumeTarget();
+
+        if (!bgmAudioSource.isPlaying)
+        {
+            bgmAudioSource.Play();
+        }
+    }
+
+    float GetCurrentBGMVolumeTarget()
+    {
+        return isBGMMuted ? 0f : bgmTargetVolume;
     }
 }
