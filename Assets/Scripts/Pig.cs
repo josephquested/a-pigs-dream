@@ -56,6 +56,10 @@ public class Pig : MonoBehaviour
     public float rotationAngle = 15f;
     public Transform pigModelTransform;
     public Animator pigAnimator;
+    [Header("ANIMATION")]
+    public float runAnimationSpeedMultiplier = 1f;
+    public float minimumRunAnimationSpeed = 1f;
+    public float maximumRunAnimationSpeed = 3f;
     public ParticleSystem dashParticleSystem;
     public GameObject waterSplashParticlesPrefab;
     public GameObject bushExplodeParticlesPrefab;
@@ -138,11 +142,30 @@ public class Pig : MonoBehaviour
             return;
 
         string targetAnimation = isGrounded ? "Run" : "Jump";
-        if (currentAnimationName == targetAnimation)
+        if (currentAnimationName != targetAnimation)
+        {
+            pigAnimator.Play(targetAnimation);
+            currentAnimationName = targetAnimation;
+        }
+
+        UpdateRunAnimationSpeed();
+    }
+
+    void UpdateRunAnimationSpeed()
+    {
+        if (pigAnimator == null)
             return;
 
-        pigAnimator.Play(targetAnimation);
-        currentAnimationName = targetAnimation;
+        if (!isGrounded || isJumping)
+        {
+            pigAnimator.speed = 1f;
+            return;
+        }
+
+        float safeBaseForwardSpeed = Mathf.Max(0.01f, forwardSpeed);
+        float speedRatio = currentForwardSpeed / safeBaseForwardSpeed;
+        float targetRunAnimationSpeed = speedRatio * runAnimationSpeedMultiplier;
+        pigAnimator.speed = Mathf.Clamp(targetRunAnimationSpeed, minimumRunAnimationSpeed, maximumRunAnimationSpeed);
     }
 
     void UpdateJump()
@@ -408,6 +431,11 @@ public class Pig : MonoBehaviour
 
         float crashDuration = gameController != null ? Mathf.Max(0f, gameController.gameOverScreenDelay) : 1f;
         StartCoroutine(PlayCrashDeathAnimation(crashDuration));
+    }
+
+    public void TriggerHungerDeath()
+    {
+        TriggerCrashDeath("Pig ran out of time and starved!");
     }
 
     void SpawnBushExplodeParticles(Vector3 spawnPosition)

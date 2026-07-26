@@ -6243,7 +6243,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Pig
   forwardSpeed: 18
-  sideSpeed: 13
+  sideSpeed: 11
   jumpHeight: 2
   jumpDuration: 0.6
   groundCheckDistance: 0.4
@@ -6253,10 +6253,13 @@ MonoBehaviour:
   dashDuration: 0.17
   dashCooldownDuration: 0.5
   tiltAngle: 0
-  tiltSpeed: 10
+  tiltSpeed: 15
   rotationAngle: 40
   pigModelTransform: {fileID: 2128811424}
   pigAnimator: {fileID: 2128811425}
+  runAnimationSpeedMultiplier: 1
+  minimumRunAnimationSpeed: 1
+  maximumRunAnimationSpeed: 4
   dashParticleSystem: {fileID: 1735360840}
   waterSplashParticlesPrefab: {fileID: 3246886405276576482, guid: acab50a077dfa8f46a89518a703254f3, type: 3}
   bushExplodeParticlesPrefab: {fileID: 1498233074592429079, guid: f8701256d80b644478c57f0499c5631a, type: 3}

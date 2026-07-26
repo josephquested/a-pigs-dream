@@ -11,11 +11,13 @@ public class GameController : MonoBehaviour
 
     CameraController cameraController;
     LevelController levelController;
+    Pig pig;
 
     void Start()
     {
         cameraController = GameObject.FindFirstObjectByType<CameraController>();
         levelController = GameObject.FindFirstObjectByType<LevelController>();
+        pig = GameObject.FindFirstObjectByType<Pig>();
 
         if (AudioController.Instance != null)
         {
@@ -139,7 +141,14 @@ public class GameController : MonoBehaviour
             
             if (timeRemaining <= 0)
             {
-                GameOver();
+                if (pig != null)
+                {
+                    pig.TriggerHungerDeath();
+                }
+                else
+                {
+                    GameOver();
+                }
             }
         }
     }
